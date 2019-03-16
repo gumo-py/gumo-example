@@ -1,0 +1,7 @@
+FROM google/cloud-sdk:225.0.0
+
+WORKDIR /app
+
+COPY . .
+
+CMD ["gcloud", "version"]

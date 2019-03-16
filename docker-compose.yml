@@ -17,3 +17,14 @@ services:
       dockerfile: Dockerfile.testing
     volumes:
       - ./server:/app
+
+  server_deploy:
+    build:
+      context: server
+      dockerfile: Dockerfile.deploy
+    volumes:
+      - ./server:/app
+      - ~/.config/gcloud:/root/.config/gcloud
+    environment:
+      CLOUDSDK_CORE_PROJECT: gumo-example
+    # command: gcloud app deploy src/app.yaml
