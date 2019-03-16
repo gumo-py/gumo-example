@@ -11,7 +11,7 @@ def app_configure():
     )
 
     datastore.configure_once(
-        use_local_emulator=False,
-        emulator_host='localhost:8888',
-        namespace='namespace',
+        use_local_emulator='DATASTORE_EMULATOR_HOST' in os.environ,
+        emulator_host=os.environ.get('DATASTORE_EMULATOR_HOST'),
+        namespace=os.environ.get('DATASTORE_NAMESPACE'),
     )

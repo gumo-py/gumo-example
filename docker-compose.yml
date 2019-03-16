@@ -10,6 +10,9 @@ services:
       - ./server:/app
     environment:
       SERVER_PORT: 8080
+      DATASTORE_EMULATOR_HOST: datastore_emulator:8081
+    links:
+      - datastore_emulator
     ports:
       - "8080:8080"
 
@@ -30,3 +33,17 @@ services:
     environment:
       CLOUDSDK_CORE_PROJECT: gumo-example
     # command: gcloud app deploy src/app.yaml
+
+  datastore_emulator:
+    image: singularities/datastore-emulator
+    volumes:
+      - datastore-emulator-storage:/opt/data
+    environment:
+      DATASTORE_PROJECT_ID: gumo-example
+      DATASTORE_LISTEN_ADDRESS: 0.0.0.0:8081
+    ports:
+      - "8081:8081"
+
+volumes:
+  datastore-emulator-storage:
+    driver: local
