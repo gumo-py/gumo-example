@@ -1,12 +1,10 @@
-import main
+import mytest
 import json
 
 
 def test_index():
-    main.app.testing = True
-    client = main.app.test_client()
+    response = mytest.client.get('/books')
 
-    response = client.get('/books')
     assert response.status_code == 200
     books = json.loads(response.data.decode('utf-8'))
     assert len(books) == 1
