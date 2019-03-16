@@ -1,0 +1,11 @@
+version: 2.1
+
+jobs:
+  build:
+    machine: true
+
+    steps:
+      - checkout
+      - run:
+          name: server_test
+          command: docker-compose run --rm server_test
