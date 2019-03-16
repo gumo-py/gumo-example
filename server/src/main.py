@@ -10,7 +10,7 @@ from configuration import app_configure
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 # Initialization process in development environment.
-if __name__ == '__main__':
+if __name__ == '__main__' or 'PYTEST' in os.environ:
     app_yaml_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         'app.yaml'
