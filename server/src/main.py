@@ -7,6 +7,8 @@ import flask.views
 from gumo.core import MockAppEngineEnvironment
 from configuration import app_configure
 
+from bookshelf.presentation import bookshelf_blueprint
+
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 # Initialization process in development environment.
@@ -22,6 +24,7 @@ app_configure()
 
 app = flask.Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+app.register_blueprint(bookshelf_blueprint)
 
 
 @app.route('/')
