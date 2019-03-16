@@ -2,12 +2,16 @@ from logging import getLogger
 
 import flask.views
 
+from injector import Injector
+
+from bookshelf.application import BooksFetchService
+
 from bookshelf.domain import Book
-from bookshelf.domain import BookTitle
-from bookshelf.domain import BookAuthor
-from bookshelf.domain import ISBN
+
+from bookshelf.bind import bind
 
 logger = getLogger(__name__)
+injector = Injector([bind])
 bookshelf_blueprint = flask.Blueprint('bookshelf', __name__)
 
 
@@ -22,17 +26,13 @@ class BookJSONEncoder:
 
 
 class BooksView(flask.views.MethodView):
+    _fetch_service = injector.get(BooksFetchService)  # type: BooksFetchService
+
     def get(self):
-        book = Book(
-            title=BookTitle('book title'),
-            primary_author=BookAuthor('book primary author'),
-            authors=[BookAuthor('book secondary author')],
-            isbn=ISBN('978-4-00-310101-8'),
-        )
-        logger.info(f'book = {book}')
+        books = self._fetch_service.fetch()
 
         return flask.jsonify([
-            BookJSONEncoder().encode(book)
+            BookJSONEncoder().encode(book) for book in books
         ])
 
     def post(self):
