@@ -1,0 +1,22 @@
+FROM python:3.7.2-stretch
+
+WORKDIR /app
+
+RUN mkdir -p src
+
+COPY src/requirements.in src/
+COPY src/requirements.txt src/
+COPY test/requirements.testing.in test/
+COPY test/requirements.testing.txt test/
+
+RUN pip install --no-cache-dir pip-tools
+RUN pip-compile --output-file src/requirements.txt src/requirements.in
+RUN pip-compile --output-file test/requirements.testing.txt test/requirements.testing.in
+
+RUN pip install --no-cache-dir -r src/requirements.txt -r test/requirements.testing.txt
+
+ENV PYTHONPATH /app/src
+
+COPY . .
+
+CMD ["pytest", "-v", "-s", "test"]
