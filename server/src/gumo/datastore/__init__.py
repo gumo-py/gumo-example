@@ -15,8 +15,7 @@ __all__ = [
     clear.__name__,
 
     EntityKey.__name__,
+    Configuration.__name__,
 ]
 
 logger = getLogger('gumo.datastore')
-
-

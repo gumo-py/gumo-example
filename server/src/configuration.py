@@ -4,6 +4,7 @@ import gumo
 import gumo.core._configuration
 from gumo import datastore
 
+
 def app_configure():
     gumo.core._configuration.configure_once(
         google_cloud_project=os.environ.get('PROJECT_NAME'),

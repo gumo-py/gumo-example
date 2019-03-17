@@ -24,7 +24,7 @@ class GoogleCloudLocation:
     # 以下のリンク ：[2] をご参照ください。
     #
     # [1] https://developers.google.com/api-client-library/python/apis/compute/v1
-    # [2] https://developers.google.com/resources/api-libraries/documentation/compute/v1/python/latest/compute_v1.regions.html#list
+    # [2] https://developers.google.com/resources/api-libraries/documentation/compute/v1/python/latest/compute_v1.regions.html#list # noqa: E501
     AVAILABLE_LOCATIONS = [
         'us-west1',  # オレゴン
         'us-west2',  # ロサンゼルス
