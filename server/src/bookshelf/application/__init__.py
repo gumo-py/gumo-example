@@ -3,7 +3,10 @@ from injector import inject
 
 from typing import List
 
-from bookshelf.application.repository import BookRepository
+import datetime
+
+from bookshelf.application.book.factory import BookFactory
+from bookshelf.application.book.repository import BookRepository
 
 from bookshelf.domain import Book
 
@@ -20,5 +23,13 @@ class BooksFetchService:
 
     def fetch(self) -> List[Book]:
         books = self._repository.fetch_list()
-        # TODO: permission check
+
+        # TODO: move to BookCreateService
+        book = BookFactory().build_for_new(
+            title=f'book title {datetime.datetime.now().isoformat()}',
+            primary_author='sample author',
+            isbn='978-1-234567-890',
+        )
+
+        self._repository.save(book)
         return books

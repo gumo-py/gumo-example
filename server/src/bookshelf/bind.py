@@ -1,4 +1,4 @@
-from bookshelf.application.repository import BookRepository
+from bookshelf.application.book.repository import BookRepository
 from bookshelf.infrastructure.repository import DatastoreBookRepository
 
 
