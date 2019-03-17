@@ -6,6 +6,7 @@ from typing import Optional
 from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
 from gumo.core.domain import GoogleCloudProjectID
+from gumo.core.domain import ApplicationPlatform
 from gumo.core.exceptions import ConfigurationError
 
 logger = getLogger('gumo.core')
@@ -30,9 +31,13 @@ class ConfigurationFactory:
             google_cloud_location if google_cloud_location else os.environ.get('GOOGLE_CLOUD_LOCATION')
         )
 
+        is_google_platform = 'GAE_DEPLOYMENT_ID' in os.environ and 'GAE_INSTANCE' in os.environ
+        application_platform = ApplicationPlatform.GoogleAppEngine if is_google_platform else ApplicationPlatform.Local
+
         return GumoConfiguration(
             google_cloud_project=project_id,
             google_cloud_location=location,
+            application_platform=application_platform,
         )
 
 

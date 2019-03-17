@@ -1,4 +1,5 @@
 import dataclasses
+import enum
 
 
 @dataclasses.dataclass(frozen=True)
@@ -57,7 +58,13 @@ class GoogleCloudLocation:
             raise ValueError(f'Invalid value of {self.value} is not available locations.')
 
 
+class ApplicationPlatform(enum.Enum):
+    Local = 'local'
+    GoogleAppEngine = 'google-app-engine'
+
+
 @dataclasses.dataclass(frozen=True)
 class GumoConfiguration:
     google_cloud_project: GoogleCloudProjectID
     google_cloud_location: GoogleCloudLocation
+    application_platform: ApplicationPlatform
