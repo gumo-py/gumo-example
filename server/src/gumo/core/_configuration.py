@@ -23,11 +23,11 @@ class ConfigurationFactory:
     ) -> Configuration:
 
         project_id = GoogleCloudProjectID(
-            project_id=google_cloud_project if google_cloud_project else os.environ.get('GOOGLE_CLOUD_PROJECT')
+            google_cloud_project if google_cloud_project else os.environ.get('GOOGLE_CLOUD_PROJECT')
         )
 
         location = GoogleCloudLocation(
-            location=google_cloud_location if google_cloud_location else os.environ.get('GOOGLE_CLOUD_LOCATION')
+            google_cloud_location if google_cloud_location else os.environ.get('GOOGLE_CLOUD_LOCATION')
         )
 
         return Configuration(

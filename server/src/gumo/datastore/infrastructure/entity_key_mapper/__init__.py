@@ -13,7 +13,7 @@ class EntityKeyMapper:
 
     def to_datastore_key(self, entity_key: EntityKey) -> datastore.Key:
         # TODO: configuration は DI で注入するようにしたい
-        project = configure_once().google_cloud_project.project_id
+        project = configure_once().google_cloud_project.value
         datastore_key = datastore.Key(*entity_key.flat_pairs(), project=project)
 
         return datastore_key

@@ -3,11 +3,11 @@ import dataclasses
 
 @dataclasses.dataclass(frozen=True)
 class GoogleCloudProjectID:
-    project_id: str
+    value: str
 
     def __post_init__(self):
-        if not isinstance(self.project_id, str):
-            raise ValueError(f'project_id must be a string, expect: {type(self.project_id)}')
+        if not isinstance(self.value, str):
+            raise ValueError(f'project_id must be a string, expect: {type(self.value)}')
 
 
 @dataclasses.dataclass(frozen=True)
@@ -47,14 +47,14 @@ class GoogleCloudLocation:
         'asia-northeast1',  # 東京
         'australia-southeast1',  # シドニー
     ]
-    location: str
+    value: str
 
     def __post_init__(self):
-        if not isinstance(self.location, str):
-            raise ValueError(f'location must be a string, expect: {type(self.location)}')
+        if not isinstance(self.value, str):
+            raise ValueError(f'location must be a string, expect: {type(self.value)}')
 
-        if self.location not in self.AVAILABLE_LOCATIONS:
-            raise ValueError(f'Invalid value of {self.location} is not available locations.')
+        if self.value not in self.AVAILABLE_LOCATIONS:
+            raise ValueError(f'Invalid value of {self.value} is not available locations.')
 
 
 @dataclasses.dataclass(frozen=True)
