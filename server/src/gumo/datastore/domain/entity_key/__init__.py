@@ -24,6 +24,9 @@ class RootKey:
     def pairs(self):
         return []
 
+    def flat_pairs(self):
+        return []
+
     def kind(self):
         return 'Root'
 
@@ -50,6 +53,14 @@ class EntityKey:
 
     def pairs(self):
         return self._pairs
+
+    def flat_pairs(self):
+        flat_pairs = []
+        for pair in self.pairs():
+            flat_pairs.append(pair.kind)
+            flat_pairs.append(pair.name)
+
+        return flat_pairs
 
     def kind(self):
         return self._pairs[-1].kind
