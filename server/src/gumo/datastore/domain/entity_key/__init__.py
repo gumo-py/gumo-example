@@ -1,5 +1,6 @@
 import dataclasses
 from typing import List
+from typing import Union
 
 
 @dataclasses.dataclass(frozen=True)
@@ -73,6 +74,15 @@ class EntityKeyFactory:
     def __init__(self):
         pass
 
-    def build_from_pairs(self, pairs: List[tuple]) -> EntityKey:
-        _pairs = [KeyPair(pair[0], pair[1]) for pair in pairs]
+    def build_from_pairs(self, pairs: List[Union[tuple, dict]]) -> EntityKey:
+        _pairs = []
+        for pair in pairs:
+            if isinstance(pair, dict):
+                key_pair = KeyPair(pair.get('kind'), pair.get('name'))
+            elif isinstance(pair, tuple) or isinstance(pair, list):
+                key_pair = KeyPair(pair[0], pair[1])
+            else:
+                raise ValueError(f'Unknown object type: {type(pair)}, got: {pair}')
+            _pairs.append(key_pair)
+
         return EntityKey(_pairs)
