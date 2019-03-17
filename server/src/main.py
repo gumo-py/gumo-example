@@ -8,6 +8,7 @@ from gumo.core import MockAppEngineEnvironment
 from configuration import app_configure
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Initialization process in development environment.
 if __name__ == '__main__' or 'PYTEST' in os.environ:
