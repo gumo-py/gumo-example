@@ -1,0 +1,6 @@
+description: Create a new book
+parameters:
+  - name: BookCreateParameter
+    in: body
+    schema:
+      $ref: '#/definitions/BookCreateRequest'

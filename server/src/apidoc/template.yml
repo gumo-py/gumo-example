@@ -1,0 +1,27 @@
+definitions:
+  BookCreateRequest:
+    type: object
+    properties:
+      title:
+        type: string
+        description: Title of the Book
+        required: true
+        example: book title
+      primary_author:
+        type: string
+        description: Primary author of the Book
+        required: true
+        example: book primary author
+      authors:
+        type: array
+        items:
+          type: string
+        description: Author list of the Book
+        required: false
+        example:
+          - secondary author
+      isbn:
+        type: string
+        description: ISBN code of the Book
+        required: true
+        example:  978-3-16-148410-0

@@ -3,6 +3,7 @@ import sys
 import logging
 
 import flask.views
+import flasgger
 
 from gumo.core import MockAppEngineEnvironment
 from configuration import app_configure
@@ -23,7 +24,17 @@ app_configure()
 
 app = flask.Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
-
+app.config['SWAGGER'] = {
+    'title': 'Gumo Example',
+    'doc_dir': os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        'apidoc',
+    )
+}
+swagger = flasgger.Swagger(
+    app,
+    template_file=os.path.join(app.config['SWAGGER']['doc_dir'], 'template.yml')
+)
 
 def register_blueprints(application):
     from bookshelf.presentation import bookshelf_blueprint

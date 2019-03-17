@@ -19,6 +19,7 @@ bookshelf_blueprint = flask.Blueprint('bookshelf', __name__)
 class BookJSONEncoder:
     def encode(self, book: Book):
         return {
+            'key': str(book.key),
             'title': book.title.value,
             'primary_author': book.primary_author.value,
             'authors': [a.value for a in book.authors],
@@ -47,6 +48,6 @@ class BooksView(flask.views.MethodView):
 
 bookshelf_blueprint.add_url_rule(
     '/books',
-    view_func=BooksView.as_view(name='books'),
+    view_func=BooksView.as_view(name='bookshelf/books'),
     methods=['GET', 'POST']
 )

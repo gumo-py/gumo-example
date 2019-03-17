@@ -3,8 +3,6 @@ from injector import inject
 
 from typing import List
 
-import datetime
-
 from bookshelf.application.book.factory import BookFactory
 from bookshelf.application.book.repository import BookRepository
 
