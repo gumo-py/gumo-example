@@ -3,7 +3,7 @@ import pytest
 from gumo.core import configure
 from gumo.core import clear
 from gumo.core._configuration import ConfigurationFactory
-from gumo.core.domain import Configuration
+from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
 from gumo.core.domain import GoogleCloudProjectID
 from gumo.core.exceptions import ConfigurationError
@@ -15,7 +15,7 @@ def test_configuration_factory_build():
         google_cloud_location='asia-northeast1'
     )
 
-    assert o == Configuration(
+    assert o == GumoConfiguration(
         google_cloud_project=GoogleCloudProjectID('test-project'),
         google_cloud_location=GoogleCloudLocation('asia-northeast1'),
     )

@@ -58,6 +58,6 @@ class GoogleCloudLocation:
 
 
 @dataclasses.dataclass(frozen=True)
-class Configuration:
+class GumoConfiguration:
     google_cloud_project: GoogleCloudProjectID
     google_cloud_location: GoogleCloudLocation

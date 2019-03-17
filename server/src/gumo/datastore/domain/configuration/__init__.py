@@ -3,7 +3,7 @@ from typing import Optional
 
 
 @dataclasses.dataclass(frozen=True)
-class Configuration:
+class DatastoreConfiguration:
     use_local_emulator: bool = False
     emulator_host: Optional[str] = None
     namespace: Optional[str] = None

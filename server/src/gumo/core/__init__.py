@@ -3,7 +3,7 @@ from gumo.core._configuration import configure_once
 from gumo.core._configuration import is_configured
 from gumo.core._configuration import clear
 
-from gumo.core.domain import Configuration
+from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
 from gumo.core.domain import GoogleCloudProjectID
 from gumo.core.exceptions import ConfigurationError
@@ -17,7 +17,7 @@ __all__ = [
     is_configured.__name__,
     clear.__name__,
 
-    Configuration.__name__,
+    GumoConfiguration.__name__,
     GoogleCloudLocation.__name__,
     GoogleCloudProjectID.__name__,
     ConfigurationError.__name__,

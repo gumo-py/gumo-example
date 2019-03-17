@@ -3,7 +3,7 @@ import pytest
 from gumo.datastore import configure
 from gumo.datastore import clear
 from gumo.datastore._configuration import ConfigurationFactory
-from gumo.datastore.domain.configuration import Configuration
+from gumo.datastore.domain.configuration import DatastoreConfiguration
 from gumo.core.exceptions import ConfigurationError
 
 
@@ -14,7 +14,7 @@ def test_configuration_factory_build():
         namespace='test',
     )
 
-    assert o == Configuration(
+    assert o == DatastoreConfiguration(
         use_local_emulator=True,
         emulator_host='localhost:8080',
         namespace='test',

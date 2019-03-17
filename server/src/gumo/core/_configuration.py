@@ -3,7 +3,7 @@ import threading
 from logging import getLogger
 from typing import Optional
 
-from gumo.core.domain import Configuration
+from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
 from gumo.core.domain import GoogleCloudProjectID
 from gumo.core.exceptions import ConfigurationError
@@ -20,7 +20,7 @@ class ConfigurationFactory:
             cls,
             google_cloud_project: Optional[str] = None,
             google_cloud_location: Optional[str] = None,
-    ) -> Configuration:
+    ) -> GumoConfiguration:
 
         project_id = GoogleCloudProjectID(
             google_cloud_project if google_cloud_project else os.environ.get('GOOGLE_CLOUD_PROJECT')
@@ -30,7 +30,7 @@ class ConfigurationFactory:
             google_cloud_location if google_cloud_location else os.environ.get('GOOGLE_CLOUD_LOCATION')
         )
 
-        return Configuration(
+        return GumoConfiguration(
             google_cloud_project=project_id,
             google_cloud_location=location,
         )
