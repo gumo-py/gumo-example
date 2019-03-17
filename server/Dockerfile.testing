@@ -10,10 +10,19 @@ COPY test/requirements.testing.in test/
 COPY test/requirements.testing.txt test/
 
 RUN pip install --no-cache-dir pip-tools
-RUN pip-compile --output-file src/requirements.txt src/requirements.in
-RUN pip-compile --output-file test/requirements.testing.txt test/requirements.testing.in
 
-RUN pip install --no-cache-dir -r src/requirements.txt -r test/requirements.testing.txt
+RUN pip-compile \
+        --output-file src/requirements.txt \
+        src/requirements.in
+
+RUN pip-compile \
+        --output-file test/requirements.testing.txt \
+        test/requirements.testing.in \
+        src/requirements.txt
+
+RUN pip install --no-cache-dir \
+        -r src/requirements.txt \
+        -r test/requirements.testing.txt
 
 ENV PYTHONPATH /app/src
 
