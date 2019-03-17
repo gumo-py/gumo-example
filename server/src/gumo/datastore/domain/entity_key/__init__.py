@@ -73,6 +73,11 @@ class EntityKey:
     def name(self):
         return self._pairs[-1].name
 
+    def key_literal(self):
+        return 'Key({})'.format(', '.join([
+            f"'{i}'" for i in self.flat_pairs()
+        ]))
+
 
 class EntityKeyFactory:
     def __init__(self):

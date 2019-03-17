@@ -62,3 +62,8 @@ def test_build_for_new():
     assert isinstance(key.name(), str)
     assert len(key.name()) == 26
     assert isinstance(key.parent(), RootKey)
+
+
+def test_entity_key_literal():
+    key = EntityKeyFactory().build(kind='Book', name='name')
+    assert key.key_literal() == "Key('Book', 'name')"
