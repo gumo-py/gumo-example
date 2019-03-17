@@ -60,6 +60,18 @@ services:
       - "8082:8082"
     command: --no-store-on-disk --consistency=1
 
+  datastore_ui:
+    build:
+      context: server/tools/datastore_ui
+    environment:
+      PORT: "8000"
+    links:
+      - datastore_emulator
+      - datastore_emulator_test
+    ports:
+      - "8000:8000"
+
+
 volumes:
   datastore-emulator-storage:
     driver: local
