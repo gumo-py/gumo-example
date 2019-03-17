@@ -3,6 +3,7 @@ from typing import List
 from typing import Union
 from typing import Optional
 
+import copy
 import base64
 import uuid
 
@@ -78,6 +79,15 @@ class EntityKey:
             f"'{i}'" for i in self.flat_pairs()
         ]))
 
+    def key_path(self):
+        pairs = []
+        for pair in self.pairs():
+            pairs.append(f'{pair.kind}:{pair.name}')
+        return '/'.join(pairs)
+
+    def key_path_urlsafe(self):
+        return self.key_path().replace('/', '%2F').replace(':', '%3A')
+
 
 class EntityKeyFactory:
     def __init__(self):
@@ -98,7 +108,7 @@ class EntityKeyFactory:
 
     def build(self, kind: str, name: str, parent: Optional[EntityKey] = None) -> EntityKey:
         if parent:
-            pairs = parent.pairs()
+            pairs = copy.deepcopy(parent.pairs())
         else:
             pairs = []
         pairs.append(KeyPair(kind=kind, name=name))

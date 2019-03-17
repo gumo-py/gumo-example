@@ -67,3 +67,13 @@ def test_build_for_new():
 def test_entity_key_literal():
     key = EntityKeyFactory().build(kind='Book', name='name')
     assert key.key_literal() == "Key('Book', 'name')"
+
+
+def test_entity_key_path():
+    key = EntityKeyFactory().build(kind='Book', name='name')
+    child = EntityKeyFactory().build(kind='Comment', name='comment', parent=key)
+
+    assert key.key_path() == 'Book:name'
+    assert key.key_path_urlsafe() == 'Book%3Aname'
+    assert child.key_path() == 'Book:name/Comment:comment'
+    assert child.key_path_urlsafe() == 'Book%3Aname%2FComment%3Acomment'
