@@ -45,6 +45,13 @@ def configure(**kwargs):
 
         _CONFIG = ConfigurationFactory.build(**kwargs)
         logger.debug(f'Gumo is configured, config={_CONFIG}')
+
+        if 'GOOGLE_CLOUD_PROJECT' not in os.environ:
+            logger.debug('Environment Variable "GOOGLE_CLOUD_PROJECT" is not configured.')
+            project_id = _CONFIG.google_cloud_project.value
+            os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
+            logger.debug(f'Environment Variable "GOOGLE_CLOUD_PROJECT" is update to {project_id}')
+
         return _CONFIG
 
 
