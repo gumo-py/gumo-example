@@ -10,4 +10,4 @@ class Configuration:
 
     def __post_init__(self):
         if self.use_local_emulator and self.emulator_host is None:
-            raise ValueError(f'if emulator enabled, then emulator_host must be present.')
+            raise ValueError(f'If the emulator enabled, then emulator_host must be present.')
