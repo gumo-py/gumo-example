@@ -11,6 +11,7 @@ services:
     environment:
       SERVER_PORT: 8080
       DATASTORE_EMULATOR_HOST: datastore_emulator:8081
+      GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
     links:
       - datastore_emulator
     ports:
@@ -25,6 +26,7 @@ services:
     environment:
       PYTEST: "true"
       DATASTORE_EMULATOR_HOST: datastore_emulator_test:8082
+      GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
     links:
       - datastore_emulator_test
 
