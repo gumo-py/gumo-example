@@ -1,6 +1,10 @@
 import dataclasses
 from typing import List
 from typing import Union
+from typing import Optional
+
+import base64
+import uuid
 
 
 @dataclasses.dataclass(frozen=True)
@@ -86,3 +90,20 @@ class EntityKeyFactory:
             _pairs.append(key_pair)
 
         return EntityKey(_pairs)
+
+    def build(self, kind: str, name: str, parent: Optional[EntityKey] = None) -> EntityKey:
+        if parent:
+            pairs = parent.pairs()
+        else:
+            pairs = []
+        pairs.append(KeyPair(kind=kind, name=name))
+
+        return EntityKey(pairs)
+
+    def build_for_new(self, kind: str, parent: Optional[EntityKey] = None) -> EntityKey:
+        name = self._generate_new_uuid()
+        return self.build(kind=kind, name=name, parent=parent)
+
+    def _generate_new_uuid(self) -> str:
+        s = base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
+        return s.replace('======', '').lower()

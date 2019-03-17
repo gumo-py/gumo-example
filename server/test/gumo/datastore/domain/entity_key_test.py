@@ -47,3 +47,18 @@ def test_dict_pairs_to_key():
 def test_flat_pairs():
     key = EntityKeyFactory().build_from_pairs(pairs=sample_key_pairs)
     assert key.flat_pairs() == ['Book', 'name', 'BookComment', 'comment']
+
+
+def test_build():
+    key = EntityKeyFactory().build(kind='Book', name='name')
+    assert key.kind() == 'Book'
+    assert key.name() == 'name'
+    assert isinstance(key.parent(), RootKey)
+
+
+def test_build_for_new():
+    key = EntityKeyFactory().build_for_new(kind='Book')
+    assert key.kind() == 'Book'
+    assert isinstance(key.name(), str)
+    assert len(key.name()) == 26
+    assert isinstance(key.parent(), RootKey)
