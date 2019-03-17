@@ -1,6 +1,7 @@
 from gumo.core._configuration import configure
 from gumo.core._configuration import configure_once
 from gumo.core._configuration import is_configured
+from gumo.core._configuration import get_gumo_config
 from gumo.core._configuration import clear
 
 from gumo.core.domain import GumoConfiguration
@@ -15,6 +16,7 @@ __all__ = [
     configure.__name__,
     configure_once.__name__,
     is_configured.__name__,
+    get_gumo_config.__name__,
     clear.__name__,
 
     GumoConfiguration.__name__,

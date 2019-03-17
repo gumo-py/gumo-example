@@ -67,6 +67,13 @@ def is_configured():
         return _CONFIG is not None
 
 
+def get_gumo_config() -> GumoConfiguration:
+    with _CONFIG_LOCK:
+        if _CONFIG:
+            return _CONFIG
+        else:
+            raise ConfigurationError('Gumo is not configured.')
+
 def clear():
     global _CONFIG
 

@@ -68,6 +68,14 @@ def is_configured() -> bool:
         return _CONFIG is not None
 
 
+def get_datastore_config() -> DatastoreConfiguration:
+    with _CONFIG_LOCK:
+        if _CONFIG:
+            return _CONFIG
+        else:
+            raise ConfigurationError('Gumo.Datastore is not configured.')
+
+
 def clear():
     global _CONFIG
 
