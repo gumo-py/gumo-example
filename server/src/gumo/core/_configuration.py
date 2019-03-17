@@ -34,7 +34,7 @@ class ConfigurationFactory:
         is_google_platform = 'GAE_DEPLOYMENT_ID' in os.environ and 'GAE_INSTANCE' in os.environ
         application_platform = ApplicationPlatform.GoogleAppEngine if is_google_platform else ApplicationPlatform.Local
 
-        if application_platform == ApplicationPlatform.GoogleAppEngine:
+        if application_platform == ApplicationPlatform.Local:
             if 'GOOGLE_APPLICATION_CREDENTIALS' not in os.environ:
                 raise ConfigurationError('Envrionment variable "GOOGLE_APPLICATION_CREDENTIALS" is required.')
 
