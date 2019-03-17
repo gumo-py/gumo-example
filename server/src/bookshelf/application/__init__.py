@@ -23,13 +23,26 @@ class BooksFetchService:
 
     def fetch(self) -> List[Book]:
         books = self._repository.fetch_list()
+        return books
 
-        # TODO: move to BookCreateService
-        book = BookFactory().build_for_new(
-            title=f'book title {datetime.datetime.now().isoformat()}',
-            primary_author='sample author',
-            isbn='978-1-234567-890',
+
+class BookCreateService:
+    @inject
+    def __init__(
+            self,
+            repository: BookRepository,
+    ):
+        self._repository = repository
+        self._factory = BookFactory()
+
+    def create(self, doc: dict) -> Book:
+        book = self._factory.build_for_new(
+            title=doc.get('title'),
+            primary_author=doc.get('primary_author'),
+            authors=doc.get('authors'),
+            isbn=doc.get('isbn'),
         )
 
-        self._repository.save(book)
-        return books
+        self._repository.save(book=book)
+
+        return book

@@ -5,6 +5,7 @@ import flask.views
 from injector import Injector
 
 from bookshelf.application import BooksFetchService
+from bookshelf.application import BookCreateService
 
 from bookshelf.domain import Book
 
@@ -27,6 +28,7 @@ class BookJSONEncoder:
 
 class BooksView(flask.views.MethodView):
     _fetch_service = injector.get(BooksFetchService)  # type: BooksFetchService
+    _create_service = injector.get(BookCreateService)  # type: BookCreateService
 
     def get(self):
         books = self._fetch_service.fetch()
@@ -36,7 +38,11 @@ class BooksView(flask.views.MethodView):
         ])
 
     def post(self):
-        return flask.jsonify({})
+        j = flask.request.json
+        book = self._create_service.create(doc=j)
+        return flask.jsonify(
+            BookJSONEncoder().encode(book)
+        )
 
 
 bookshelf_blueprint.add_url_rule(
