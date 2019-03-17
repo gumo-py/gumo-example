@@ -36,6 +36,7 @@ swagger = flasgger.Swagger(
     template_file=os.path.join(app.config['SWAGGER']['doc_dir'], 'template.yml')
 )
 
+
 def register_blueprints(application):
     from bookshelf.presentation import bookshelf_blueprint
     application.register_blueprint(bookshelf_blueprint)

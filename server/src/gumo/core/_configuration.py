@@ -90,6 +90,7 @@ def get_gumo_config() -> GumoConfiguration:
         else:
             raise ConfigurationError('Gumo is not configured.')
 
+
 def clear():
     global _CONFIG
 

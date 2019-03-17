@@ -1,7 +1,6 @@
 from typing import List
 
 from bookshelf.domain import Book
-from bookshelf.domain import Book
 
 
 class BookRepository:

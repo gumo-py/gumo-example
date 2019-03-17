@@ -16,15 +16,15 @@ class BookFactory:
             authors: List[str] = None,
             isbn: Optional[str] = None,
     ) -> Book:
-       return Book(
-           key=key,
-           title=fundamental.BookTitle(title),
-           primary_author=fundamental.BookAuthor(primary_author),
-           authors=[
-               fundamental.BookAuthor(a) for a in authors if a
-           ] if authors else [],
-           isbn=fundamental.ISBN(isbn),
-       )
+        return Book(
+            key=key,
+            title=fundamental.BookTitle(title),
+            primary_author=fundamental.BookAuthor(primary_author),
+            authors=[
+                fundamental.BookAuthor(a) for a in authors if a
+            ] if authors else [],
+            isbn=fundamental.ISBN(isbn),
+        )
 
     def build_for_new(
             self,
