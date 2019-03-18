@@ -122,3 +122,11 @@ class EntityKeyFactory:
     def _generate_new_uuid(self) -> str:
         s = base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
         return s.replace('======', '').lower()
+
+    def build_from_key_path(self, key_path: str) -> EntityKey:
+        pairs = []
+        for pair in key_path.replace('%2F', '/').replace('%3A', ':').split('/'):
+            kind, name = pair.split(':')
+            pairs.append(KeyPair(kind=kind, name=name))
+
+        return EntityKey(pairs)
