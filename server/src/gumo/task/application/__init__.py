@@ -1,6 +1,8 @@
 import datetime
 from typing import Optional
 
+from logging import getLogger
+
 from injector import Injector
 
 from gumo.task.domain import GumoTask
@@ -10,6 +12,7 @@ from gumo.task.application.repository import GumoTaskRepository
 
 from gumo.task.bind import bind as task_bind
 
+logger = getLogger(__name__)
 inject = Injector([task_bind])
 
 
@@ -28,6 +31,8 @@ def enqueue(
         schedule_time=schedule_time,
         in_seconds=in_seconds,
     )
+
+    logger.info(f'gumo.task.enqueue called. task = {task}')
 
     repository = inject.get(GumoTaskRepository)  # type: GumoTaskRepository
     repository.enqueue(task=task, queue_name=queue_name)
