@@ -84,4 +84,4 @@ def clear():
             return
 
         _CONFIG = None
-        logger.debug('Cleared a gumo configuration.')
+        logger.debug('Cleared a Gumo.Datastore configuration.')
