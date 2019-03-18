@@ -62,3 +62,24 @@ def test_build_for_new():
     assert isinstance(key.name(), str)
     assert len(key.name()) == 26
     assert isinstance(key.parent(), RootKey)
+
+
+def test_entity_key_literal():
+    key = EntityKeyFactory().build(kind='Book', name='name')
+    assert key.key_literal() == "Key('Book', 'name')"
+
+
+def test_entity_key_path():
+    factory = EntityKeyFactory()
+    key = factory.build(kind='Book', name='name')
+    child = factory.build(kind='Comment', name='comment', parent=key)
+
+    assert key.key_path() == 'Book:name'
+    assert key.key_path_urlsafe() == 'Book%3Aname'
+    assert child.key_path() == 'Book:name/Comment:comment'
+    assert child.key_path_urlsafe() == 'Book%3Aname%2FComment%3Acomment'
+
+    assert factory.build_from_key_path(key.key_path()) == key
+    assert factory.build_from_key_path(key.key_path_urlsafe()) == key
+    assert factory.build_from_key_path(child.key_path()) == child
+    assert factory.build_from_key_path(child.key_path_urlsafe()) == child

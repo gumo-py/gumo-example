@@ -19,7 +19,8 @@ bookshelf_blueprint = flask.Blueprint('bookshelf', __name__)
 class BookJSONEncoder:
     def encode(self, book: Book):
         return {
-            'key': str(book.key),
+            'key': book.key.key_literal(),
+            'urlsafe_key': book.key.key_path_urlsafe(),
             'title': book.title.value,
             'primary_author': book.primary_author.value,
             'authors': [a.value for a in book.authors],

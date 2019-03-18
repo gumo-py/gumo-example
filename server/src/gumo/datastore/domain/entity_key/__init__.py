@@ -3,6 +3,7 @@ from typing import List
 from typing import Union
 from typing import Optional
 
+import copy
 import base64
 import uuid
 
@@ -73,6 +74,20 @@ class EntityKey:
     def name(self):
         return self._pairs[-1].name
 
+    def key_literal(self):
+        return 'Key({})'.format(', '.join([
+            f"'{i}'" for i in self.flat_pairs()
+        ]))
+
+    def key_path(self):
+        pairs = []
+        for pair in self.pairs():
+            pairs.append(f'{pair.kind}:{pair.name}')
+        return '/'.join(pairs)
+
+    def key_path_urlsafe(self):
+        return self.key_path().replace('/', '%2F').replace(':', '%3A')
+
 
 class EntityKeyFactory:
     def __init__(self):
@@ -93,7 +108,7 @@ class EntityKeyFactory:
 
     def build(self, kind: str, name: str, parent: Optional[EntityKey] = None) -> EntityKey:
         if parent:
-            pairs = parent.pairs()
+            pairs = copy.deepcopy(parent.pairs())
         else:
             pairs = []
         pairs.append(KeyPair(kind=kind, name=name))
@@ -107,3 +122,11 @@ class EntityKeyFactory:
     def _generate_new_uuid(self) -> str:
         s = base64.b32encode(uuid.uuid4().bytes).decode('utf-8')
         return s.replace('======', '').lower()
+
+    def build_from_key_path(self, key_path: str) -> EntityKey:
+        pairs = []
+        for pair in key_path.replace('%2F', '/').replace('%3A', ':').split('/'):
+            kind, name = pair.split(':')
+            pairs.append(KeyPair(kind=kind, name=name))
+
+        return EntityKey(pairs)
