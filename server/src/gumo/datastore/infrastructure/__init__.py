@@ -1,8 +1,6 @@
-from gumo.datastore.infrastructure.datastore_client import DatastoreClient
-from gumo.datastore.infrastructure.entity_key_mapper import EntityKeyMapper
+from gumo.datastore.infrastructure.repository import DatastoreRepositoryMixin
 
 
 __all__ = [
-    EntityKeyMapper.__name__,
-    DatastoreClient.__name__,
+    DatastoreRepositoryMixin.__name__,
 ]
