@@ -13,6 +13,7 @@ from gumo.task.infrastructure.cloud_tasks import CloudTasksRepository
 
 logger = getLogger(__name__)
 
+
 class DatastoreGumoTaskMapper:
     def to_datastore_entity(self, task: GumoTask) -> dict:
         j = {

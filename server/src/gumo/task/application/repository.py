@@ -43,4 +43,3 @@ class GumoTaskRepository:
             queue_name: Optional[str] = None
     ):
         raise NotImplementedError()
-
