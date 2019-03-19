@@ -11,10 +11,10 @@ from gumo.task_emulator._configuration import get_task_emulator_config
 from gumo.task_emulator._configuration import clear
 from gumo.task_emulator.domain.configuration import TaskEmulatorConfiguration
 
-from gumo.task_emulator.presentation.restapi import emulator_api_blueprint
-
 
 def task_emulator_app():
+    from gumo.task_emulator.presentation.restapi import emulator_api_blueprint
+
     flask_app = flask.Flask(__name__)
     flask_app.config['JSON_AS_ASCII'] = False
     flask_app.config['SWAGGER'] = {

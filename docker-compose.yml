@@ -82,6 +82,7 @@ services:
     volumes:
       - ./server:/app
     environment:
+      SERVER_HOST: server
       SERVER_PORT: 8080
       TASK_EMULATOR_PORT: 8083
       DATASTORE_EMULATOR_HOST: datastore_emulator:8081

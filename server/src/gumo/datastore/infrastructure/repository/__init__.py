@@ -1,4 +1,5 @@
 from gumo.core import get_gumo_config
+from gumo.core import GumoConfiguration
 from gumo.datastore import get_datastore_config
 
 from gumo.datastore.infrastructure.entity_key_mapper import EntityKeyMapper
@@ -15,7 +16,7 @@ class DatastoreRepositoryMixin:
     @property
     def datastore_client(self) -> datastore.Client:
         if self._datastore_client is None:
-            gumo_config = get_gumo_config()
+            gumo_config = get_gumo_config(GumoConfiguration)
             datastore_config = get_datastore_config()
 
             self._datastore_client = datastore.Client(

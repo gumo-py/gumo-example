@@ -2,6 +2,7 @@ import os
 import threading
 from logging import getLogger
 from typing import Optional
+from injector import Injector
 
 from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
@@ -13,6 +14,52 @@ logger = getLogger('gumo.core')
 
 _CONFIG = None
 _CONFIG_LOCK = threading.RLock()  # Guards initialization.
+
+_BIND_CONFIG = []
+_BIND_LOCK = threading.RLock()
+
+_INJECTOR = None
+_INJECTOR_LOCK = threading.RLock()
+
+_GUMO_CONFIGS = {}
+_GUMO_CONFIGS_LOCK = threading.RLock()
+
+
+def activate_gumo_module(interface, config):
+    with _GUMO_CONFIGS_LOCK:
+        _GUMO_CONFIGS[interface] = config
+
+
+def get_gumo_config(interface):
+    with _GUMO_CONFIGS_LOCK:
+        if interface in _GUMO_CONFIGS:
+            return _GUMO_CONFIGS[interface]()
+
+        raise ConfigurationError(f'Gumo {interface} is not configured.')
+
+
+def append_binding(binder):
+    global _BIND_CONFIG
+    global _INJECTOR
+
+    with _BIND_LOCK:
+        logger.debug(f'append binding={binder}, {binder.__module__}')
+        _BIND_CONFIG.append(binder)
+
+        with _INJECTOR_LOCK:
+            _INJECTOR = Injector(_BIND_CONFIG)
+
+        return _BIND_CONFIG
+
+
+def get_bindings():
+    with _BIND_LOCK:
+        return _BIND_CONFIG
+
+
+def get_injector():
+    with _INJECTOR_LOCK:
+        return _INJECTOR
 
 
 class ConfigurationFactory:
@@ -59,7 +106,13 @@ def configure(**kwargs):
             logger.debug('Environment Variable "GOOGLE_CLOUD_PROJECT" is not configured.')
             project_id = _CONFIG.google_cloud_project.value
             os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
-            logger.debug(f'Environment Variable "GOOGLE_CLOUD_PROJECT" is update to {project_id}')
+            logger.debug(f'Environment Variable "GOOGLE_CLOUD_PROJECT" has been updated to {project_id}')
+
+        def binder(binder):
+            binder.bind(GumoConfiguration, to=get_core_config)
+
+        append_binding(binder)
+        activate_gumo_module(GumoConfiguration, get_core_config)
 
         return _CONFIG
 
@@ -83,7 +136,7 @@ def is_configured():
         return _CONFIG is not None
 
 
-def get_gumo_config() -> GumoConfiguration:
+def get_core_config() -> GumoConfiguration:
     with _CONFIG_LOCK:
         if _CONFIG:
             return _CONFIG

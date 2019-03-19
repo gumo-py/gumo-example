@@ -3,4 +3,4 @@ from gumo.datastore import get_datastore_config
 
 
 def bind(binder):
-    binder.bind(DatastoreConfiguration, to=get_datastore_config())
+    binder.bind(DatastoreConfiguration, to=get_datastore_config)

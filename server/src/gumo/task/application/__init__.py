@@ -3,23 +3,15 @@ from typing import Optional
 
 from logging import getLogger
 
-from injector import Injector
-
 from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
 
-from gumo.core.bind import bind as core_bind
-from gumo.datastore.bind import bind as datastore_bind
-from gumo.task.bind import bind as task_bind
+from gumo.core import get_injector
 
 logger = getLogger(__name__)
-inject = Injector([
-    core_bind,
-    datastore_bind,
-    task_bind,
-])
+injector = get_injector()
 
 
 def enqueue(
@@ -40,7 +32,7 @@ def enqueue(
 
     logger.info(f'gumo.task.enqueue called. task = {task}')
 
-    repository = inject.get(GumoTaskRepository)  # type: GumoTaskRepository
+    repository = injector.get(GumoTaskRepository)  # type: GumoTaskRepository
     repository.enqueue(task=task, queue_name=queue_name)
 
     return task

@@ -5,6 +5,8 @@ from typing import Optional
 from typing import Union
 
 from gumo.core import ConfigurationError
+from gumo.core import append_binding
+from gumo.core import activate_gumo_module
 from gumo.datastore.domain.configuration import DatastoreConfiguration
 
 
@@ -44,6 +46,12 @@ def configure(**kwargs) -> DatastoreConfiguration:
 
         _CONFIG = ConfigurationFactory.build(**kwargs)
         logger.debug(f'Gumo.Datastore is configured, config={_CONFIG}')
+
+        from gumo.datastore.bind import bind
+        append_binding(bind)
+
+        activate_gumo_module(DatastoreConfiguration, get_datastore_config)
+
         return _CONFIG
 
 

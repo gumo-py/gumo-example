@@ -7,4 +7,4 @@ from gumo.task import get_task_config
 
 def bind(binder):
     binder.bind(GumoTaskRepository, to=GumoTaskRepositoryImpl)
-    binder.bind(TaskConfiguration, to=get_task_config())
+    binder.bind(TaskConfiguration, to=get_task_config)

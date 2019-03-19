@@ -4,6 +4,7 @@ import logging
 
 from gumo.core import MockAppEngineEnvironment
 from configuration import app_configure
+from gumo import task_emulator
 from gumo.task_emulator import task_emulator_app
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -19,6 +20,9 @@ if __name__ == '__main__' or 'PYTEST' in os.environ:
 
 # Application framework initialization process.
 app_configure()
+task_emulator.configure_once(
+    server_host=os.environ.get('SERVER_HOST'),
+)
 
 app = task_emulator_app()
 

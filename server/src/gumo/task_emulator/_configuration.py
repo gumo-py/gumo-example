@@ -2,6 +2,8 @@ import threading
 from logging import getLogger
 
 from gumo.core import ConfigurationError
+from gumo.core import append_binding
+from gumo.core import activate_gumo_module
 from gumo.task_emulator.domain.configuration import TaskEmulatorConfiguration
 
 
@@ -31,6 +33,12 @@ def configure(**kwargs) -> TaskEmulatorConfiguration:
 
         _CONFIG = ConfigurationFactory.build(**kwargs)
         logger.debug(f'Gumo.TaskEmulator is configured, config={_CONFIG}')
+
+        from gumo.task_emulator.bind import bind
+        append_binding(bind)
+
+        activate_gumo_module(TaskEmulatorConfiguration, get_task_emulator_config)
+
         return _CONFIG
 
 
