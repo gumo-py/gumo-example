@@ -11,7 +11,7 @@ class GumoTaskFactory:
     def build(
             self,
             key: EntityKey,
-            url: str,
+            relative_uri: str,
             method: str = 'POST',
             payload: Optional[dict] = None,
             schedule_time: Optional[datetime.date] = None,
@@ -29,7 +29,7 @@ class GumoTaskFactory:
 
         return GumoTask(
             key=key,
-            url=url,
+            relative_uri=relative_uri,
             method=method,
             payload=payload,
             schedule_time=schedule_time,
@@ -38,7 +38,7 @@ class GumoTaskFactory:
 
     def build_for_new(
             self,
-            url: str,
+            relative_uri: str,
             method: str = 'POST',
             payload: Optional[dict] = None,
             schedule_time: Optional[datetime.date] = None,
@@ -48,7 +48,7 @@ class GumoTaskFactory:
 
         return self.build(
             key=EntityKeyFactory().build_for_new(kind=GumoTask.KIND),
-            url=url,
+            relative_uri=relative_uri,
             method=method,
             payload=payload,
             schedule_time=schedule_time,

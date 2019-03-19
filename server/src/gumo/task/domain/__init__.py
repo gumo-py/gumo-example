@@ -11,7 +11,7 @@ class GumoTask:
     KIND = 'GumoTask'
 
     key: EntityKey
-    url: str
+    relative_uri: str
     method: str = 'POST'
     payload: Optional[dict] = dataclasses.field(default_factory=dict)
     schedule_time: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)

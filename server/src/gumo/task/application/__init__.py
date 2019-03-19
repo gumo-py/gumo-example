@@ -31,7 +31,7 @@ def enqueue(
         queue_name: Optional[str] = None,
 ) -> GumoTask:
     task = GumoTaskFactory().build_for_new(
-        url=url,
+        relative_uri=url,
         method=method,
         payload=payload,
         schedule_time=schedule_time,
