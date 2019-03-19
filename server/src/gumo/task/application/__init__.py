@@ -10,10 +10,16 @@ from gumo.task.domain import GumoTask
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
 
+from gumo.core.bind import bind as core_bind
+from gumo.datastore.bind import bind as datastore_bind
 from gumo.task.bind import bind as task_bind
 
 logger = getLogger(__name__)
-inject = Injector([task_bind])
+inject = Injector([
+    core_bind,
+    datastore_bind,
+    task_bind,
+])
 
 
 def enqueue(
