@@ -14,7 +14,33 @@ class KeyPair:
     name: str
 
 
-class RootKey:
+class _BaseKey:
+    def parent(self):
+        raise NotImplementedError()
+
+    def pairs(self) -> List:
+        return []
+
+    def flat_pairs(self) -> List:
+        return []
+
+    def kind(self) -> str:
+        raise NotImplementedError()
+
+    def name(self) -> str:
+        raise NotImplementedError()
+
+    def key_literal(self) -> str:
+        raise NotImplementedError()
+
+    def key_path(self) -> str:
+        raise NotImplementedError()
+
+    def key_path_urlsafe(self) -> str:
+        raise NotImplementedError()
+
+
+class NoneKey(_BaseKey):
     _root = None
 
     @classmethod
@@ -34,17 +60,29 @@ class RootKey:
         return []
 
     def kind(self):
-        return 'Root'
+        return None
 
     def name(self):
-        return 'root'
+        return None
 
     def __repr__(self):
-        return "RootKey(kind='Root', name='root')"
+        return "NoneKey(kind='None', name='none')"
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+    def key_literal(self):
+        return None
+
+    def key_path(self):
+        return None
+
+    def key_path_urlsafe(self):
+        return None
 
 
 @dataclasses.dataclass(frozen=True)
-class EntityKey:
+class EntityKey(_BaseKey):
     _pairs: List[KeyPair]
 
     def __post_init__(self):
@@ -53,7 +91,7 @@ class EntityKey:
 
     def parent(self):
         if len(self._pairs) == 1:
-            return RootKey.get_instance()
+            return NoneKey.get_instance()
 
         return EntityKey(self._pairs[0:-1])
 
