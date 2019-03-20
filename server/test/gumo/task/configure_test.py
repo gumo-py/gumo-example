@@ -1,7 +1,6 @@
 import pytest
 
 from gumo.task import configure
-from gumo.task import clear
 from gumo.task._configuration import ConfigurationFactory
 from gumo.task.domain.configuration import TaskConfiguration
 from gumo.core.exceptions import ConfigurationError
@@ -25,6 +24,5 @@ def test_configure_duplicated():
         'default_queue_name': 'gumo-default-queue'
     }
     with pytest.raises(ConfigurationError):
-        clear()
         configure(**config)
         configure(**config)

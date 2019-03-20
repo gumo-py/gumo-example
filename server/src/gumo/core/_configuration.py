@@ -16,26 +16,6 @@ _CONFIG = None
 _CONFIG_LOCK = threading.RLock()  # Guards initialization.
 
 
-def activate_gumo_module(interface, config):
-    pass
-
-
-def get_gumo_config(interface):
-    pass
-
-
-def append_binding(binder):
-    pass
-
-
-def get_bindings():
-    pass
-
-
-def get_injector():
-    pass
-
-
 class ConfigurationFactory:
     @classmethod
     def build(
@@ -66,14 +46,20 @@ class ConfigurationFactory:
         )
 
 
-def configure(**kwargs):
+def configure(
+        google_cloud_project: Optional[str] = None,
+        google_cloud_location: Optional[str] = None,
+):
     global _CONFIG
 
     with _CONFIG_LOCK:
         if _CONFIG:
             raise ConfigurationError('Gumo is already configured.')
 
-        _CONFIG = ConfigurationFactory.build(**kwargs)
+        _CONFIG = ConfigurationFactory.build(
+            google_cloud_project=google_cloud_project,
+            google_cloud_location=google_cloud_location,
+        )
         logger.debug(f'Gumo is configured, config={_CONFIG}')
 
         if 'GOOGLE_CLOUD_PROJECT' not in os.environ:
@@ -85,41 +71,3 @@ def configure(**kwargs):
         injector.binder.bind(GumoConfiguration, _CONFIG)
 
         return _CONFIG
-
-
-def configure_once(
-        google_cloud_project: Optional[str] = None,
-        google_cloud_location: Optional[str] = None,
-):
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-
-        return configure(
-            google_cloud_project=google_cloud_project,
-            google_cloud_location=google_cloud_location,
-        )
-
-
-def is_configured():
-    with _CONFIG_LOCK:
-        return _CONFIG is not None
-
-
-def get_core_config() -> GumoConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-        else:
-            raise ConfigurationError('Gumo is not configured.')
-
-
-def clear():
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG is None:
-            return
-
-        _CONFIG = None
-        logger.debug('Cleared a gumo configuration.')

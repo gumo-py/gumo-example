@@ -3,15 +3,15 @@ from typing import Optional
 
 from logging import getLogger
 
+from gumo.core.injector import injector
+from gumo.task.bind import bind
 from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
 
-from gumo.core import get_injector
-
 logger = getLogger(__name__)
-injector = get_injector()
+injector.binder.install(bind)
 
 
 def enqueue(

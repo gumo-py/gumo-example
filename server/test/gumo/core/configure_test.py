@@ -1,7 +1,6 @@
 import pytest
 
 from gumo.core import configure
-from gumo.core import clear
 from gumo.core._configuration import ConfigurationFactory
 from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
@@ -37,6 +36,5 @@ def test_configure_duplicated():
         'google_cloud_location': 'asia-northeast1'
     }
     with pytest.raises(ConfigurationError):
-        clear()
         configure(**config)
         configure(**config)

@@ -1,12 +1,11 @@
 from logging import getLogger
 import flask.views
 
-from gumo.core import get_injector
+from gumo.core.injector import injector
 
 from gumo.task_emulator.application import TaskFetchService
 
 logger = getLogger(__name__)
-injector = get_injector()
 emulator_api_blueprint = flask.Blueprint('task-emulator', __name__)
 
 

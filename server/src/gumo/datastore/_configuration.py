@@ -36,56 +36,24 @@ class ConfigurationFactory:
         )
 
 
-def configure(**kwargs) -> DatastoreConfiguration:
+def configure(
+        use_local_emulator: Union[str, bool, None] = None,
+        emulator_host: Optional[str] = None,
+        namespace: Optional[str] = None,
+) -> DatastoreConfiguration:
     global _CONFIG
 
     with _CONFIG_LOCK:
         if _CONFIG:
             raise ConfigurationError('Gumo.Datastore is already configured.')
 
-        _CONFIG = ConfigurationFactory.build(**kwargs)
+        _CONFIG = ConfigurationFactory.build(
+            use_local_emulator=use_local_emulator,
+            emulator_host=emulator_host,
+            namespace=namespace,
+        )
         logger.debug(f'Gumo.Datastore is configured, config={_CONFIG}')
 
         injector.binder.bind(DatastoreConfiguration, to=_CONFIG)
 
         return _CONFIG
-
-
-def configure_once(
-        use_local_emulator: Union[str, bool, None] = None,
-        emulator_host: Optional[str] = None,
-        namespace: Optional[str] = None,
-) -> DatastoreConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-
-        return configure(
-            use_local_emulator=use_local_emulator,
-            emulator_host=emulator_host,
-            namespace=namespace,
-        )
-
-
-def is_configured() -> bool:
-    with _CONFIG_LOCK:
-        return _CONFIG is not None
-
-
-def get_datastore_config() -> DatastoreConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-        else:
-            raise ConfigurationError('Gumo.Datastore is not configured.')
-
-
-def clear():
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG is None:
-            return
-
-        _CONFIG = None
-        logger.debug('Cleared a Gumo.Datastore configuration.')

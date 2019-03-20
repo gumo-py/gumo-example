@@ -34,54 +34,23 @@ class ConfigurationFactory:
         )
 
 
-def configure(**kwargs) -> TaskConfiguration:
+def configure(
+        default_queue_name: str,
+        use_local_task_emulator: Union[str, bool, None] = False
+) -> TaskConfiguration:
     global _CONFIG
 
     with _CONFIG_LOCK:
         if _CONFIG:
             raise ConfigurationError('Gumo.Task is already configured.')
 
-        _CONFIG = ConfigurationFactory.build(**kwargs)
+        _CONFIG = ConfigurationFactory.build(
+            default_queue_name=default_queue_name,
+            use_local_task_emulator=use_local_task_emulator,
+        )
         logger.debug(f'Gumo.Task is configured, config={_CONFIG}')
 
         injector.binder.bind(TaskConfiguration, to=_CONFIG)
 
         return _CONFIG
 
-
-def configure_once(
-        default_queue_name: str,
-        use_local_task_emulator: Union[str, bool, None] = False
-) -> TaskConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-
-        return configure(
-            default_queue_name=default_queue_name,
-            use_local_task_emulator=use_local_task_emulator,
-        )
-
-
-def is_configured() -> bool:
-    with _CONFIG_LOCK:
-        return _CONFIG is not None
-
-
-def get_task_config() -> TaskConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-        else:
-            raise ConfigurationError('Gumo.Task is not configured.')
-
-
-def clear():
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG is None:
-            return
-
-        _CONFIG = None
-        logger.debug('Cleared a Gumo.Task configuration.')
