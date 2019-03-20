@@ -4,7 +4,7 @@ from typing import List
 
 from gumo.datastore.infrastructure import DatastoreRepositoryMixin
 from gumo.task.domain import GumoTask
-from gumo.task.infrastructure.repository import DatastoreGumoTaskMapper
+from gumo.task.infrastructure.mapper import DatastoreGumoTaskMapper
 
 from gumo.task_emulator.application.repository import TaskRepository
 
