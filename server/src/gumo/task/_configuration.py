@@ -4,6 +4,7 @@ from typing import Union
 
 from gumo.core.injector import injector
 from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.bind import task_bind
 
 
 logger = getLogger('gumo.task')
@@ -40,6 +41,7 @@ def configure(
     logger.debug(f'Gumo.Task is configured, config={config}')
 
     injector.binder.bind(TaskConfiguration, to=config)
+    injector.binder.install(task_bind)
 
     return config
 

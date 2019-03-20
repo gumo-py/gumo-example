@@ -4,14 +4,12 @@ from typing import Optional
 from logging import getLogger
 
 from gumo.core.injector import injector
-from gumo.task.bind import bind
 from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
 
 logger = getLogger(__name__)
-injector.binder.install(bind)
 
 
 def enqueue(
