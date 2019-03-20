@@ -1,17 +1,12 @@
-import threading
 from logging import getLogger
 
 from typing import Union
 
 from gumo.core.injector import injector
-from gumo.core import ConfigurationError
 from gumo.task.domain.configuration import TaskConfiguration
 
 
 logger = getLogger('gumo.task')
-
-_CONFIG = None
-_CONFIG_LOCK = threading.RLock()
 
 
 class ConfigurationFactory:
@@ -38,19 +33,13 @@ def configure(
         default_queue_name: str,
         use_local_task_emulator: Union[str, bool, None] = False
 ) -> TaskConfiguration:
-    global _CONFIG
+    config = ConfigurationFactory.build(
+        default_queue_name=default_queue_name,
+        use_local_task_emulator=use_local_task_emulator,
+    )
+    logger.debug(f'Gumo.Task is configured, config={config}')
 
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            raise ConfigurationError('Gumo.Task is already configured.')
+    injector.binder.bind(TaskConfiguration, to=config)
 
-        _CONFIG = ConfigurationFactory.build(
-            default_queue_name=default_queue_name,
-            use_local_task_emulator=use_local_task_emulator,
-        )
-        logger.debug(f'Gumo.Task is configured, config={_CONFIG}')
-
-        injector.binder.bind(TaskConfiguration, to=_CONFIG)
-
-        return _CONFIG
+    return config
 

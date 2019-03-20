@@ -1,12 +1,10 @@
 import pytest
 
-from gumo.core import configure
 from gumo.core._configuration import ConfigurationFactory
 from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
 from gumo.core.domain import GoogleCloudProjectID
 from gumo.core.domain import ApplicationPlatform
-from gumo.core.exceptions import ConfigurationError
 
 
 def test_configuration_factory_build():
@@ -28,13 +26,3 @@ def test_configuration_factory_build_failed():
             google_cloud_project='test-project',
             google_cloud_location='unknown-location'
         )
-
-
-def test_configure_duplicated():
-    config = {
-        'google_cloud_project': 'test-project',
-        'google_cloud_location': 'asia-northeast1'
-    }
-    with pytest.raises(ConfigurationError):
-        configure(**config)
-        configure(**config)

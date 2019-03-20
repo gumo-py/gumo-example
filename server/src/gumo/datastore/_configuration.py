@@ -1,18 +1,13 @@
-import threading
 from logging import getLogger
 
 from typing import Optional
 from typing import Union
 
 from gumo.core.injector import injector
-from gumo.core import ConfigurationError
 from gumo.datastore.domain.configuration import DatastoreConfiguration
 
 
 logger = getLogger('gumo.datastore')
-
-_CONFIG = None
-_CONFIG_LOCK = threading.RLock()
 
 
 class ConfigurationFactory:
@@ -41,19 +36,13 @@ def configure(
         emulator_host: Optional[str] = None,
         namespace: Optional[str] = None,
 ) -> DatastoreConfiguration:
-    global _CONFIG
+    config = ConfigurationFactory.build(
+        use_local_emulator=use_local_emulator,
+        emulator_host=emulator_host,
+        namespace=namespace,
+    )
+    logger.debug(f'Gumo.Datastore is configured, config={config}')
 
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            raise ConfigurationError('Gumo.Datastore is already configured.')
+    injector.binder.bind(DatastoreConfiguration, to=config)
 
-        _CONFIG = ConfigurationFactory.build(
-            use_local_emulator=use_local_emulator,
-            emulator_host=emulator_host,
-            namespace=namespace,
-        )
-        logger.debug(f'Gumo.Datastore is configured, config={_CONFIG}')
-
-        injector.binder.bind(DatastoreConfiguration, to=_CONFIG)
-
-        return _CONFIG
+    return config
