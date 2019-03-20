@@ -43,7 +43,7 @@ class BooksView(flask.views.MethodView):
 
     def post(self):
         doc = flask.request.json
-        request_book= self._factory.build_for_new(
+        request_book = self._factory.build_for_new(
             title=doc.get('title'),
             primary_author=doc.get('primary_author'),
             authors=doc.get('authors'),

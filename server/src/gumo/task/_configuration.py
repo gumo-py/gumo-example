@@ -44,4 +44,3 @@ def configure(
     injector.binder.install(task_bind)
 
     return config
-
