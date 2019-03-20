@@ -6,6 +6,14 @@ jobs:
 
     steps:
       - checkout
+
+      - run:
+          name: create credential file
+          command: |
+            mkdir -p server/credentials
+            rm -f server/credentials/service-account-development.json
+            echo $GCP_CREDENTIALS_GUMO_EXAMPLE_cc27faf21a78 > server/credentials/service-account-development.json
+
       - run:
           name: server_test
           command: docker-compose run --rm server_test

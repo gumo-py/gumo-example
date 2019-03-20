@@ -3,7 +3,6 @@ from injector import inject
 
 from typing import List
 
-from bookshelf.application.book.factory import BookFactory
 from bookshelf.application.book.repository import BookRepository
 
 from bookshelf.domain import Book
@@ -31,16 +30,10 @@ class BookCreateService:
             repository: BookRepository,
     ):
         self._repository = repository
-        self._factory = BookFactory()
 
-    def create(self, doc: dict) -> Book:
-        book = self._factory.build_for_new(
-            title=doc.get('title'),
-            primary_author=doc.get('primary_author'),
-            authors=doc.get('authors'),
-            isbn=doc.get('isbn'),
-        )
-
+    def create(self, book: Book) -> Book:
         self._repository.save(book=book)
+
+        # something process ...
 
         return book

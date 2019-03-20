@@ -5,8 +5,7 @@ from bookshelf.application.book.repository import BookRepository
 from bookshelf.domain import Book
 from bookshelf.domain import fundamental
 
-from gumo.datastore.infrastructure import DatastoreClient
-from gumo.datastore.infrastructure import EntityKeyMapper
+from gumo.datastore.infrastructure import DatastoreRepositoryMixin
 
 from gumo.datastore import EntityKey
 
@@ -37,26 +36,24 @@ class DatastoreBookMapper:
         )
 
 
-class DatastoreBookRepository(BookRepository):
+class DatastoreBookRepository(BookRepository, DatastoreRepositoryMixin):
     def __init__(self):
-        self._client = DatastoreClient.get_instance()
-        self._key_mapper = EntityKeyMapper()
-        self._mapper = DatastoreBookMapper()
+        self._book_mapper = DatastoreBookMapper()
 
     def fetch_list(self) -> List[Book]:
-        query = self._client.client.query(kind=Book.KIND)
+        query = self.datastore_client.query(kind=Book.KIND)
         books = []
 
         for datastore_entity in query.fetch():
-            books.append(self._mapper.to_entity(
-                key=self._key_mapper.to_entity_key(datastore_key=datastore_entity.key),
+            books.append(self._book_mapper.to_entity(
+                key=self.entity_key_mapper.to_entity_key(datastore_key=datastore_entity.key),
                 doc=datastore_entity,
             ))
 
         return books
 
     def save(self, book: Book):
-        datastore_key = self._key_mapper.to_datastore_key(entity_key=book.key)
-        e = self._client.Entity(key=datastore_key)
-        e.update(self._mapper.to_datastore_entity(book=book))
-        self._client.client.put(e)
+        datastore_key = self.entity_key_mapper.to_datastore_key(entity_key=book.key)
+        e = self.DatastoreEntity(key=datastore_key)
+        e.update(self._book_mapper.to_datastore_entity(book=book))
+        self.datastore_client.put(e)

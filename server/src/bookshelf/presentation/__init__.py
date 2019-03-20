@@ -6,6 +6,7 @@ from injector import Injector
 
 from bookshelf.application import BooksFetchService
 from bookshelf.application import BookCreateService
+from bookshelf.application.book.factory import BookFactory
 
 from bookshelf.domain import Book
 
@@ -31,6 +32,7 @@ class BookJSONEncoder:
 class BooksView(flask.views.MethodView):
     _fetch_service = injector.get(BooksFetchService)  # type: BooksFetchService
     _create_service = injector.get(BookCreateService)  # type: BookCreateService
+    _factory = BookFactory()
 
     def get(self):
         books = self._fetch_service.fetch()
@@ -40,8 +42,15 @@ class BooksView(flask.views.MethodView):
         ])
 
     def post(self):
-        j = flask.request.json
-        book = self._create_service.create(doc=j)
+        doc = flask.request.json
+        request_book= self._factory.build_for_new(
+            title=doc.get('title'),
+            primary_author=doc.get('primary_author'),
+            authors=doc.get('authors'),
+            isbn=doc.get('isbn'),
+        )
+
+        book = self._create_service.create(request_book)
         return flask.jsonify(
             BookJSONEncoder().encode(book)
         )

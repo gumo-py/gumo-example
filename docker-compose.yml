@@ -12,6 +12,7 @@ services:
       SERVER_PORT: 8080
       DATASTORE_EMULATOR_HOST: datastore_emulator:8081
       GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
+      USE_TASK_EMULATOR: "true"
     links:
       - datastore_emulator
     ports:
@@ -27,6 +28,7 @@ services:
       PYTEST: "true"
       DATASTORE_EMULATOR_HOST: datastore_emulator_test:8082
       GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
+      USE_TASK_EMULATOR: "true"
     links:
       - datastore_emulator_test
 
@@ -73,6 +75,24 @@ services:
     ports:
       - "8000:8000"
 
+  task_emulator:
+    build:
+      context: server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/app
+    environment:
+      SERVER_PORT: 8080
+      TASK_EMULATOR_PORT: 8083
+      DATASTORE_EMULATOR_HOST: datastore_emulator:8081
+      GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
+      USE_TASK_EMULATOR: "true"
+    links:
+      - server
+      - datastore_emulator
+    ports:
+      - "8083:8083"
+    command: python src/task_emulator_server.py
 
 volumes:
   datastore-emulator-storage:
