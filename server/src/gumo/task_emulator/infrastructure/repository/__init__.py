@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from injector import inject
 from typing import List
 
 from gumo.datastore.infrastructure import DatastoreRepositoryMixin
@@ -12,7 +13,13 @@ logger = getLogger(__name__)
 
 
 class DatastoreTaskRepository(TaskRepository, DatastoreRepositoryMixin):
-    _task_mapper = DatastoreGumoTaskMapper()
+    @inject
+    def __init__(
+            self,
+            gumo_task_mapper: DatastoreGumoTaskMapper,
+    ):
+        super(DatastoreTaskRepository, self).__init__()
+        self._task_mapper = gumo_task_mapper
 
     def fetch_list(self) -> List[GumoTask]:
         query = self.datastore_client.query(kind=GumoTask.KIND)

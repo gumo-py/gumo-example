@@ -4,7 +4,7 @@ from typing import List
 from injector import inject
 
 from gumo.task.domain import GumoTask
-from gumo.task_emulator.application import TaskRepository
+from gumo.task_emulator.application.task.repository import TaskRepository
 
 logger = getLogger(__name__)
 

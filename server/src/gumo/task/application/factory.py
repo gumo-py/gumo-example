@@ -27,6 +27,9 @@ class GumoTaskFactory:
             delta = datetime.timedelta(seconds=in_seconds)
             schedule_time = now + delta
 
+        if schedule_time is None:
+            schedule_time = now
+
         return GumoTask(
             key=key,
             relative_uri=relative_uri,
