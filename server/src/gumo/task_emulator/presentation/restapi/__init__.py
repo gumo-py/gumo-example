@@ -1,41 +1,14 @@
 from logging import getLogger
 import flask.views
-import datetime
-from typing import Optional
 
 from gumo.core.injector import injector
 
-from gumo.task.domain import GumoTask
 from gumo.task_emulator.application.task import TaskFetchService
 from gumo.task_emulator.application.task import TaskProcessBulkCreateService
+from gumo.task_emulator.application.task.encoder import TaskJSONEncoder
 
 logger = getLogger(__name__)
 emulator_api_blueprint = flask.Blueprint('task-emulator', __name__)
-
-
-class TaskJSONEncoder:
-    def __init__(
-            self,
-            task: GumoTask,
-    ):
-        self._task = task
-
-    def datetime_to_json(self, t: datetime.datetime) -> Optional[str]:
-        if t is None:
-            return
-        return t.isoformat()
-
-    def to_json(self) -> dict:
-        j = {
-            'key': self._task.key.key_path(),
-            'keyLiteral': self._task.key.key_literal(),
-            'relativeURI': self._task.relative_uri,
-            'method': self._task.method,
-            'payload': self._task.payload,
-            'scheduleTime': self.datetime_to_json(self._task.schedule_time),
-            'createdAt': self.datetime_to_json(self._task.created_at),
-        }
-        return j
 
 
 class TasksView(flask.views.MethodView):
