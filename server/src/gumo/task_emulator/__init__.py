@@ -3,6 +3,7 @@ from logging import getLogger
 import os
 import flask.views
 import flasgger
+from celery import Celery
 
 from gumo.task_emulator._configuration import configure
 from gumo.task_emulator.domain.configuration import TaskEmulatorConfiguration
@@ -20,6 +21,9 @@ def task_emulator_app():
             'apidoc',
         )
     }
+    flask_app.config['CELERY_BROKER_URL'] = 'redis://redis:6379'
+    flask_app.config['CELERY_BACKEND_URL'] = 'redis://redis:6379'
+
     flask_app.register_blueprint(emulator_api_blueprint)
 
     flasgger.Swagger(
@@ -27,7 +31,26 @@ def task_emulator_app():
         template_file=os.path.join(flask_app.config['SWAGGER']['doc_dir'], 'template.yml')
     )
 
-    return flask_app
+    celery = make_celery(flask_app)
+
+    return flask_app, celery
+
+
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        backend=app.config['CELERY_BACKEND_URL'],
+        broker=app.config['CELERY_BROKER_URL'],
+    )
+    celery.conf.update(app.config)
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
 
 
 __all__ = [
