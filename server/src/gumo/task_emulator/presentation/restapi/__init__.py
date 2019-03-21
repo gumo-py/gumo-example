@@ -7,6 +7,7 @@ from gumo.core.injector import injector
 
 from gumo.task.domain import GumoTask
 from gumo.task_emulator.application.task import TaskFetchService
+from gumo.task_emulator.application.task import TaskProcessBulkCreateService
 
 logger = getLogger(__name__)
 emulator_api_blueprint = flask.Blueprint('task-emulator', __name__)
@@ -52,7 +53,10 @@ class TasksView(flask.views.MethodView):
 
 
 class TasksEmulatorEnqueue(flask.views.MethodView):
+    _task_process_create_service = injector.get(TaskProcessBulkCreateService)  # type: TaskProcessBulkCreateService
+
     def get(self):
+        task_processes = self._task_process_create_service.execute()
         return ''
 
     def post(self):

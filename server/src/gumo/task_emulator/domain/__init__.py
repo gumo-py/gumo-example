@@ -6,6 +6,7 @@ from typing import Optional
 from typing import List
 
 from gumo.datastore import EntityKey
+from gumo.datastore import EntityKeyFactory
 from gumo.task.domain import GumoTask
 
 
@@ -41,6 +42,12 @@ class GumoTaskProcess:
     KIND = 'GumoTaskProcess'
 
     key: EntityKey
+    relative_uri: str
+    method: str = 'POST'
+    payload: Optional[dict] = dataclasses.field(default_factory=dict)
+    schedule_time: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
+    created_at: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
+    updated_at: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
     state: TaskState = TaskState.QUEUED
     attempts: int = 0
     last_run_at: Optional[datetime.datetime] = None
@@ -49,5 +56,20 @@ class GumoTaskProcess:
     histories: List[ProcessHistory] = dataclasses.field(default_factory=list)
 
     def __post_init__(self):
-        if self.key.parent().kind() != GumoTask.KIND:
-            raise ValueError(f'key parent must be a GumoTask, but got: {self.key.key_literal()}')
+        if self.key.kind() != self.KIND:
+            raise ValueError(f'key KIND must be a {self.KIND}, but got: {self.key.kind()}')
+
+
+class GumoTaskProcessFactory:
+    def build_from_task(self, task: GumoTask) -> GumoTaskProcess:
+        now = datetime.datetime.utcnow().replace(microsecond=0)
+
+        return GumoTaskProcess(
+            key=EntityKeyFactory().build(kind=GumoTaskProcess.KIND, name=task.key.name()),
+            relative_uri=task.relative_uri,
+            method=task.method,
+            payload=task.payload,
+            schedule_time=task.schedule_time,
+            created_at=task.created_at,
+            updated_at=now,
+        )
