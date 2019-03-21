@@ -25,8 +25,13 @@ task_emulator.configure(
     server_port=os.environ.get('SERVER_PORT'),
 )
 
-app = task_emulator_app()
+app, celery = task_emulator_app()
 
+@celery.task()
+def test_task():
+    logger.info('called test_task!!!!')
+
+result = test_task.delay()
 
 if __name__ == '__main__':
     server_port = os.environ.get('TASK_EMULATOR_PORT', '8083')
