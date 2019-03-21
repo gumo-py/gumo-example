@@ -70,6 +70,7 @@ class GumoTaskProcess:
 class GumoTaskProcessFactory:
     def build_from_task(self, task: GumoTask) -> GumoTaskProcess:
         now = datetime.datetime.utcnow().replace(microsecond=0)
+        run_at = task.schedule_time if task.schedule_time else now
 
         return GumoTaskProcess(
             key=EntityKeyFactory().build(kind=GumoTaskProcess.KIND, name=task.key.name()),
@@ -79,4 +80,10 @@ class GumoTaskProcessFactory:
             schedule_time=task.schedule_time,
             created_at=task.created_at,
             updated_at=now,
+            state=TaskState.QUEUED,
+            attempts=0,
+            last_run_at=None,
+            run_at=run_at,
+            failed_at=None,
+            histories=[],
         )
