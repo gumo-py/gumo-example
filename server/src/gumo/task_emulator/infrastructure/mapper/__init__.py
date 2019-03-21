@@ -64,6 +64,7 @@ class DatastoreGumoTaskProcessMapper:
             'attempts': task_process.attempts,
             'last_run_at': task_process.last_run_at,
             'run_at': task_process.run_at,
+            'locked_at': task_process.locked_at,
             'succeeded_at': task_process.succeeded_at,
             'failed_at': task_process.failed_at,
             'histories': [
@@ -86,6 +87,7 @@ class DatastoreGumoTaskProcessMapper:
             attempts=datastore_entity.get('attempts'),
             last_run_at=datastore_entity.get('last_run_at'),
             run_at=datastore_entity.get('run_at'),
+            locked_at=datastore_entity.get('locked_at'),
             succeeded_at=datastore_entity.get('succeeded_at'),
             failed_at=datastore_entity.get('failed_at'),
             histories=[

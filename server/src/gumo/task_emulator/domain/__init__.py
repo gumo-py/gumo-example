@@ -83,6 +83,7 @@ class GumoTaskProcess:
     attempts: int = 0
     last_run_at: Optional[datetime.datetime] = None
     run_at: Optional[datetime.datetime] = None
+    locked_at: Optional[datetime.datetime] = None
     succeeded_at: Optional[datetime.datetime] = None
     failed_at: Optional[datetime.datetime] = None
     histories: List[ProcessHistory] = dataclasses.field(default_factory=list)
@@ -117,7 +118,11 @@ class GumoTaskProcess:
         return self._clone(state=state)
 
     def with_processing(self):
-        return self.with_state(state=TaskState.PROCESSING)
+        return self.with_state(
+            state=TaskState.PROCESSING
+        )._clone(
+            locked_at=datetime.datetime.utcnow(),
+        )
 
     def with_succeeded(self, history: ProcessHistory):
         return self.with_state(
@@ -126,6 +131,7 @@ class GumoTaskProcess:
             history=history
         )._clone(
             succeeded_at=datetime.datetime.utcnow(),
+            locked_at=None,
         )
 
     def reach_max_retries(self):
@@ -145,7 +151,8 @@ class GumoTaskProcess:
         )._clone(
             attempts=self.attempts + 1,
             last_run_at=history.started_at,
-            run_at=self._rescheduled_at(time=self.run_at, attempts_count=self.attempts + 1)
+            run_at=self._rescheduled_at(time=self.run_at, attempts_count=self.attempts + 1),
+            locked_at=None,
         )
 
     def _with_failed_permanent(self, history: ProcessHistory):
@@ -157,6 +164,7 @@ class GumoTaskProcess:
             attempts=self.attempts + 1,
             last_run_at=history.started_at,
             failed_at=datetime.datetime.utcnow(),
+            locked_at=None,
         )
 
     def _rescheduled_at(self, time: datetime.datetime, attempts_count) -> datetime.datetime:

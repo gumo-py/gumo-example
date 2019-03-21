@@ -57,6 +57,7 @@ class TaskProcessJSONEncoder:
             'attempts': self._task_process.attempts,
             'lastRunAt': self.datetime_to_json(self._task_process.last_run_at),
             'runAt': self.datetime_to_json(self._task_process.run_at),
+            'lockedAt': self.datetime_to_json(self._task_process.locked_at),
             'succeededAt': self.datetime_to_json(self._task_process.succeeded_at),
             'failedAt': self.datetime_to_json(self._task_process.failed_at),
             'histories': [
