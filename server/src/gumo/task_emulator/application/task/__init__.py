@@ -39,9 +39,10 @@ class TaskProcessBulkCreateService:
         self._task_process_repository = task_process_repository
         self._task_process_factory = task_process_factory
 
-    def execute(self) -> List[GumoTaskProcess]:
+    def execute(self) -> dict:
         tasks = self._task_repository.fetch_tasks(limit=50)
-        task_processes = []
+        converted_tasks = []
+        convert_skipped_tasks = []
 
         logger.info(f'Convert from GumoTask to GumoTaskProcess {len(tasks)} items.')
 
@@ -50,9 +51,14 @@ class TaskProcessBulkCreateService:
             task_process = self._build_task_process(task=task)
 
             if self._convert_task_process(task=task, task_process=task_process):
-                task_processes.append(task_process)
+                converted_tasks.append(task_process)
+            else:
+                convert_skipped_tasks.append(task_process)
 
-        return task_processes
+        return {
+            'converted_tasks': len(converted_tasks),
+            'convert_skipped_tasks': len(convert_skipped_tasks)
+        }
 
     def _build_task_process(self, task: GumoTask) -> GumoTaskProcess:
         return self._task_process_factory.build_from_task(task=task)

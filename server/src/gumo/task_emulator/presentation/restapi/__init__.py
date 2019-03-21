@@ -56,11 +56,12 @@ class TasksEmulatorEnqueue(flask.views.MethodView):
     _task_process_create_service = injector.get(TaskProcessBulkCreateService)  # type: TaskProcessBulkCreateService
 
     def get(self):
-        task_processes = self._task_process_create_service.execute()
-        return f'{len(task_processes)} items converted.'
+        result = self._task_process_create_service.execute()
+        return flask.jsonify(result)
 
     def post(self):
-        return ''
+        result = self._task_process_create_service.execute()
+        return flask.jsonify(result)
 
 
 @emulator_api_blueprint.route('/')
