@@ -3,6 +3,9 @@ import flask.views
 
 from gumo.core.injector import injector
 
+from gumo.datastore import EntityKeyFactory
+
+from gumo.task_emulator.application import TaskExecuteService
 from gumo.task_emulator.application.task import TaskFetchService
 from gumo.task_emulator.application.task import TaskProcessBulkCreateService
 from gumo.task_emulator.application.task.encoder import TaskJSONEncoder
@@ -52,6 +55,14 @@ class QueuedTasksView(flask.views.MethodView):
         })
 
 
+class ExecuteTaskView(flask.views.MethodView):
+    _service = injector.get(TaskExecuteService)  # type: TaskExecuteService
+
+    def get(self, key):
+        result = self._service.execute(key=EntityKeyFactory().build_from_key_path(key_path=key))
+        return flask.jsonify(result.to_json())
+
+
 @emulator_api_blueprint.route('/')
 def hello():
     return 'ok'
@@ -72,5 +83,11 @@ emulator_api_blueprint.add_url_rule(
 emulator_api_blueprint.add_url_rule(
     '/api/task_emulator/tasks/queued',
     view_func=QueuedTasksView.as_view(name='task_emulator/tasks/queued'),
+    methods=['GET']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/task_emulator/tasks/<key>/execute',
+    view_func=ExecuteTaskView.as_view(name='task_emulator/tasks/execute'),
     methods=['GET']
 )
