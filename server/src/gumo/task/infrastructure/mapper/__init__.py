@@ -1,8 +1,18 @@
+from injector import inject
+
 from gumo.datastore import EntityKey
 from gumo.task.domain import GumoTask
+from gumo.datastore.infrastructure import EntityKeyMapper
 
 
 class DatastoreGumoTaskMapper:
+    @inject
+    def __init__(
+            self,
+            entity_key_mapper: EntityKeyMapper
+    ):
+        self._entity_key_mapper = entity_key_mapper
+
     def to_datastore_entity(self, task: GumoTask) -> dict:
         j = {
             'relative_uri': task.relative_uri,

@@ -19,9 +19,10 @@ class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
     def __init__(
             self,
             cloud_tasks_repository: CloudTasksRepository,
+            gumo_task_mapper: DatastoreGumoTaskMapper,
     ):
         super(GumoTaskRepositoryImpl, self).__init__()
-        self._task_mapper = DatastoreGumoTaskMapper()
+        self._task_mapper = gumo_task_mapper
         self._cloud_tasks_repository = cloud_tasks_repository
 
     def _enqueue_to_cloud_tasks(

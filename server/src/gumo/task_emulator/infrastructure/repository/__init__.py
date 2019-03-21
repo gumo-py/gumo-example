@@ -21,8 +21,10 @@ class DatastoreTaskRepository(TaskRepository, DatastoreRepositoryMixin):
         super(DatastoreTaskRepository, self).__init__()
         self._task_mapper = gumo_task_mapper
 
-    def fetch_list(self) -> List[GumoTask]:
-        query = self.datastore_client.query(kind=GumoTask.KIND)
+    def _build_query(self):
+        return self.datastore_client.query(kind=GumoTask.KIND)
+
+    def _fetch_list(self, query) -> List[GumoTask]:
         tasks = []
 
         for datastore_entity in query.fetch():
@@ -32,3 +34,6 @@ class DatastoreTaskRepository(TaskRepository, DatastoreRepositoryMixin):
             ))
 
         return tasks
+
+    def fetch_tasks(self) -> List[GumoTask]:
+        return self._fetch_list(query=self._build_query())

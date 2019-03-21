@@ -18,4 +18,4 @@ class TaskFetchService:
         self._repository = repository
 
     def fetch(self) -> List[GumoTask]:
-        return self._repository.fetch_list()
+        return self._repository.fetch_tasks()
