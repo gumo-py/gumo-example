@@ -37,8 +37,8 @@ class ProcessHistory:
 
 
 @dataclasses.dataclass(frozen=True)
-class GumoTaskEmulator:
-    KIND = 'GumoTaskEmulator'
+class GumoTaskProcess:
+    KIND = 'GumoTaskProcess'
 
     key: EntityKey
     state: TaskState = TaskState.QUEUED
