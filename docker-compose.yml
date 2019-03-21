@@ -93,7 +93,7 @@ services:
       - datastore_emulator
     ports:
       - "8083:8083"
-    command: python src/task_emulator_server.py
+    command: bash src/task_emulator_server.sh
 
 volumes:
   datastore-emulator-storage:

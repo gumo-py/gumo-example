@@ -6,6 +6,7 @@ import flasgger
 
 from gumo.task_emulator._configuration import configure
 from gumo.task_emulator.domain.configuration import TaskEmulatorConfiguration
+from gumo.task_emulator.presentation.cli.worker import BackgroundWorker
 
 
 def task_emulator_app():
@@ -27,7 +28,7 @@ def task_emulator_app():
         template_file=os.path.join(flask_app.config['SWAGGER']['doc_dir'], 'template.yml')
     )
 
-    return flask_app
+    return flask_app, BackgroundWorker.get_instance()
 
 
 __all__ = [
