@@ -4,3 +4,7 @@ class GumoBaseError(RuntimeError):
 
 class ConfigurationError(GumoBaseError):
     pass
+
+
+class ObjectNotoFoundError(GumoBaseError):
+    pass
