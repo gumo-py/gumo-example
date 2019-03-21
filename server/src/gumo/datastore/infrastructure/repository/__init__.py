@@ -1,4 +1,6 @@
 from injector import inject
+from contextlib import contextmanager
+
 from gumo.core.injector import injector
 
 from gumo.core import GumoConfiguration
@@ -46,3 +48,11 @@ class DatastoreRepositoryMixin:
             self._entity_key_mapper = injector.get(EntityKeyMapper)  # type: EntityKeyMapper
 
         return self._entity_key_mapper
+
+
+@contextmanager
+def datastore_transaction():
+    datastore_client = injector.get(_DatastoreClientFactory).build()  # type: datastore.Client
+
+    with datastore_client.transaction():
+        yield
