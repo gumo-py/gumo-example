@@ -51,6 +51,14 @@ class TasksView(flask.views.MethodView):
         return 'ok'
 
 
+class TasksEmulatorEnqueue(flask.views.MethodView):
+    def get(self):
+        return ''
+
+    def post(self):
+        return ''
+
+
 @emulator_api_blueprint.route('/')
 def hello():
     return 'ok'
@@ -59,5 +67,11 @@ def hello():
 emulator_api_blueprint.add_url_rule(
     '/api/tasks',
     view_func=TasksView.as_view(name='tasks'),
+    methods=['GET', 'POST']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/tasks/emulator/enqueue',
+    view_func=TasksEmulatorEnqueue.as_view(name='tasks/emulator/enqueue'),
     methods=['GET', 'POST']
 )
