@@ -90,10 +90,15 @@ services:
       USE_TASK_EMULATOR: "true"
     depends_on:
       - server
-      - datastore_emulator
+      - redis
     ports:
       - "8083:8083"
     command: python src/task_emulator_server.py
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
 
 volumes:
   datastore-emulator-storage:
