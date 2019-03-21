@@ -25,6 +25,13 @@ class TaskState(enum.Enum):
     def is_queued(self):
         return self == self.QUEUED
 
+    @classmethod
+    def get(cls, value: str):
+        try:
+            return cls(value)
+        except ValueError:
+            return cls.QUEUED
+
 
 @dataclasses.dataclass(frozen=True)
 class ProcessHistory:

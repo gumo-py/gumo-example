@@ -57,7 +57,7 @@ class TasksEmulatorEnqueue(flask.views.MethodView):
 
     def get(self):
         task_processes = self._task_process_create_service.execute()
-        return ''
+        return f'{len(task_processes)} items converted.'
 
     def post(self):
         return ''
