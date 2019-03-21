@@ -22,6 +22,7 @@ if __name__ == '__main__' or 'PYTEST' in os.environ:
 app_configure()
 task_emulator.configure(
     server_host=os.environ.get('SERVER_HOST'),
+    server_port=os.environ.get('SERVER_PORT'),
 )
 
 app = task_emulator_app()

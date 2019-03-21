@@ -1,6 +1,7 @@
 import dataclasses
 import enum
 import datetime
+import random
 
 from typing import Optional
 from typing import List
@@ -34,19 +35,42 @@ class TaskState(enum.Enum):
 
 
 @dataclasses.dataclass(frozen=True)
+class ProcessRequest:
+    method: str
+    url: str
+    data: Optional[str]
+    headers: Optional[dict]
+
+    def data_as_bytes(self) -> Optional[bytes]:
+        if self.data is None:
+            return
+        return self.data.encode('utf-8')
+
+
+@dataclasses.dataclass(frozen=True)
 class ProcessHistory:
     started_at: datetime.datetime
-    duration_seconds: int
-    status_code: int
-    request_header: str
-    request_body: str
-    response_header: str
-    response_body: str
+    duration_seconds: float
+    method: str
+    url: str
+    data: Optional[str]
+    status_code: Optional[int] = None
+    request_headers: Optional[dict] = None
+    request_body: Optional[str] = None
+    response_headers: Optional[str] = None
+    response_body: Optional[str] = None
+    error_message: Optional[str] = None
+
+    def is_succeeded(self) -> bool:
+        return self.status_code is not None and \
+               self.error_message is None and \
+               200 <= self.status_code < 400
 
 
 @dataclasses.dataclass(frozen=True)
 class GumoTaskProcess:
     KIND = 'GumoTaskProcess'
+    MAX_RETRY_COUNT = 15
 
     key: EntityKey
     relative_uri: str
@@ -59,12 +83,97 @@ class GumoTaskProcess:
     attempts: int = 0
     last_run_at: Optional[datetime.datetime] = None
     run_at: Optional[datetime.datetime] = None
+    locked_at: Optional[datetime.datetime] = None
+    succeeded_at: Optional[datetime.datetime] = None
     failed_at: Optional[datetime.datetime] = None
     histories: List[ProcessHistory] = dataclasses.field(default_factory=list)
 
     def __post_init__(self):
         if self.key.kind() != self.KIND:
             raise ValueError(f'key KIND must be a {self.KIND}, but got: {self.key.kind()}')
+
+    def _clone(self, **changes):
+        """
+        一部の attributes を変更した、自身のオブジェクトの複製を返す
+
+        :param changes: 変更する attributes
+        :return: 一部の attributes が変更された、新しい TextExtractionJob オブジェクト
+        :rtype: GumoTaskProcess
+        """
+        return dataclasses.replace(self, **changes)
+
+    def with_history(self, history: ProcessHistory):
+        """
+        :rtype: GumoTaskProcess
+        """
+        histories = self.histories
+        histories.append(history)
+
+        return self._clone(histories=histories)
+
+    def with_state(self, state: TaskState):
+        """
+        :rtype: GumoTaskProcess
+        """
+        return self._clone(state=state)
+
+    def with_processing(self):
+        return self.with_state(
+            state=TaskState.PROCESSING
+        )._clone(
+            locked_at=datetime.datetime.utcnow(),
+        )
+
+    def with_succeeded(self, history: ProcessHistory):
+        return self.with_state(
+            state=TaskState.SUCCEEDED
+        ).with_history(
+            history=history
+        )._clone(
+            succeeded_at=datetime.datetime.utcnow(),
+            locked_at=None,
+        )
+
+    def reach_max_retries(self):
+        return self.attempts > self.MAX_RETRY_COUNT
+
+    def with_failed(self, history: ProcessHistory):
+        if self.reach_max_retries():
+            return self._with_failed_permanent(history=history)
+        else:
+            return self._with_failed_to_retry(history=history)
+
+    def _with_failed_to_retry(self, history: ProcessHistory):
+        return self.with_state(
+            state=TaskState.QUEUED
+        ).with_history(
+            history=history
+        )._clone(
+            attempts=self.attempts + 1,
+            last_run_at=history.started_at,
+            run_at=self._rescheduled_at(time=self.run_at, attempts_count=self.attempts + 1),
+            locked_at=None,
+        )
+
+    def _with_failed_permanent(self, history: ProcessHistory):
+        return self.with_state(
+            state=TaskState.FAILED
+        ).with_history(
+            history=history
+        )._clone(
+            attempts=self.attempts + 1,
+            last_run_at=history.started_at,
+            failed_at=datetime.datetime.utcnow(),
+            locked_at=None,
+        )
+
+    def _rescheduled_at(self, time: datetime.datetime, attempts_count) -> datetime.datetime:
+        base_offset = 1
+        random_offset = random.random() * 5
+        exponential_offset = pow(attempts_count, 4)
+        delta = datetime.timedelta(seconds=base_offset + random_offset + exponential_offset)
+
+        return time + delta
 
 
 class GumoTaskProcessFactory:
@@ -87,3 +196,12 @@ class GumoTaskProcessFactory:
             failed_at=None,
             histories=[],
         )
+
+    def build_with_new_history(
+            self,
+            task_process: GumoTaskProcess,
+            history: ProcessHistory
+    ) -> GumoTaskProcess:
+        histories = task_process.histories
+        histories.append(history)
+        return dataclasses.replace(task_process, histories=histories)

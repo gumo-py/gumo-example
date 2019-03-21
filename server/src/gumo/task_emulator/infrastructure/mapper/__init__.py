@@ -1,3 +1,4 @@
+import json
 from injector import inject
 
 from gumo.datastore.infrastructure import DatastoreEntity
@@ -12,11 +13,15 @@ class DatastoreGumoProcessHistoryMapper:
         j = {
             'started_at': process_history.started_at,
             'duration_seconds': process_history.duration_seconds,
+            'method': process_history.method,
+            'url': process_history.url,
+            'data': json.dumps(process_history.data),
             'status_code': process_history.status_code,
-            'request_header': process_history.request_header,
+            'request_headers': json.dumps(process_history.request_headers),
             'request_body': process_history.request_body,
-            'response_header': process_history.response_header,
+            'response_headers': json.dumps(process_history.response_headers),
             'response_body': process_history.response_body,
+            'error_message': process_history.error_message,
         }
         return j
 
@@ -24,11 +29,15 @@ class DatastoreGumoProcessHistoryMapper:
         return ProcessHistory(
             started_at=doc.get('started_at'),
             duration_seconds=doc.get('duration_seconds'),
+            method=doc.get('method'),
+            url=doc.get('url'),
+            data=json.loads(doc.get('data')),
             status_code=doc.get('status_code'),
-            request_header=doc.get('request_header'),
+            request_headers=json.loads(doc.get('request_headers')),
             request_body=doc.get('request_body'),
-            response_header=doc.get('response_header'),
+            response_headers=json.loads(doc.get('response_headers')),
             response_body=doc.get('response_body'),
+            error_message=doc.get('error_message'),
         )
 
 
@@ -52,9 +61,11 @@ class DatastoreGumoTaskProcessMapper:
             'created_at': task_process.created_at,
             'updated_at': task_process.updated_at,
             'state': task_process.state.value,
-            'attemtps': task_process.attempts,
+            'attempts': task_process.attempts,
             'last_run_at': task_process.last_run_at,
             'run_at': task_process.run_at,
+            'locked_at': task_process.locked_at,
+            'succeeded_at': task_process.succeeded_at,
             'failed_at': task_process.failed_at,
             'histories': [
                 self._process_history_mapper.to_datastore_entity(history) for history in task_process.histories
@@ -76,6 +87,8 @@ class DatastoreGumoTaskProcessMapper:
             attempts=datastore_entity.get('attempts'),
             last_run_at=datastore_entity.get('last_run_at'),
             run_at=datastore_entity.get('run_at'),
+            locked_at=datastore_entity.get('locked_at'),
+            succeeded_at=datastore_entity.get('succeeded_at'),
             failed_at=datastore_entity.get('failed_at'),
             histories=[
                 self._process_history_mapper.to_entity(history) for history in datastore_entity.get('histories')

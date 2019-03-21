@@ -55,9 +55,11 @@ class TaskProcessJSONEncoder:
             'updatedAt': self.datetime_to_json(self._task_process.updated_at),
             'state': self._task_process.state.value,
             'attempts': self._task_process.attempts,
-            'last_run_at': self.datetime_to_json(self._task_process.last_run_at),
-            'run_at': self.datetime_to_json(self._task_process.run_at),
-            'failed_at': self.datetime_to_json(self._task_process.failed_at),
+            'lastRunAt': self.datetime_to_json(self._task_process.last_run_at),
+            'runAt': self.datetime_to_json(self._task_process.run_at),
+            'lockedAt': self.datetime_to_json(self._task_process.locked_at),
+            'succeededAt': self.datetime_to_json(self._task_process.succeeded_at),
+            'failedAt': self.datetime_to_json(self._task_process.failed_at),
             'histories': [
                 self._history_to_json(history=history) for history in self._task_process.histories
             ],
@@ -69,9 +71,10 @@ class TaskProcessJSONEncoder:
             'startedAt': self.datetime_to_json(history.started_at),
             'durationSeconds': history.duration_seconds,
             'statusCode': history.status_code,
-            'requestHeader': history.request_header,
+            'requestHeaders': history.request_headers,
             'requestBody': history.request_body,
-            'responseHeader': history.response_header,
+            'responseHeaders': history.response_headers,
             'responseBody': history.response_body,
+            'errorMessage': history.error_message,
         }
         return j
