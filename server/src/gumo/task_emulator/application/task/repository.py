@@ -1,8 +1,10 @@
 from typing import List
+from typing import Optional
 
 from gumo.datastore import EntityKey
 from gumo.task.domain import GumoTask
 from gumo.task_emulator.domain import GumoTaskProcess
+from gumo.task_emulator.domain import TaskState
 
 
 class TaskRepository:
@@ -18,6 +20,9 @@ class TaskRepository:
 
 class TaskProcessRepository:
     def fetch_by_key(self, key: EntityKey) -> GumoTaskProcess:
+        raise NotImplementedError()
+
+    def fetch_tasks_by_state(self, state: TaskState, limit: Optional[int] = None) -> List[GumoTaskProcess]:
         raise NotImplementedError()
 
     def save(self, task_process: GumoTaskProcess):
