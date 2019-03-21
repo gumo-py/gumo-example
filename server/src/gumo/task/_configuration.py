@@ -1,16 +1,13 @@
-import threading
 from logging import getLogger
 
 from typing import Union
 
-from gumo.core import ConfigurationError
+from gumo.core.injector import injector
 from gumo.task.domain.configuration import TaskConfiguration
+from gumo.task.bind import task_bind
 
 
 logger = getLogger('gumo.task')
-
-_CONFIG = None
-_CONFIG_LOCK = threading.RLock()
 
 
 class ConfigurationFactory:
@@ -33,51 +30,17 @@ class ConfigurationFactory:
         )
 
 
-def configure(**kwargs) -> TaskConfiguration:
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            raise ConfigurationError('Gumo.Task is already configured.')
-
-        _CONFIG = ConfigurationFactory.build(**kwargs)
-        logger.debug(f'Gumo.Task is configured, config={_CONFIG}')
-        return _CONFIG
-
-
-def configure_once(
+def configure(
         default_queue_name: str,
         use_local_task_emulator: Union[str, bool, None] = False
 ) -> TaskConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
+    config = ConfigurationFactory.build(
+        default_queue_name=default_queue_name,
+        use_local_task_emulator=use_local_task_emulator,
+    )
+    logger.debug(f'Gumo.Task is configured, config={config}')
 
-        return configure(
-            default_queue_name=default_queue_name,
-            use_local_task_emulator=use_local_task_emulator,
-        )
+    injector.binder.bind(TaskConfiguration, to=config)
+    injector.binder.install(task_bind)
 
-
-def is_configured() -> bool:
-    with _CONFIG_LOCK:
-        return _CONFIG is not None
-
-
-def get_task_config() -> TaskConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-        else:
-            raise ConfigurationError('Gumo.Task is not configured.')
-
-
-def clear():
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG is None:
-            return
-
-        _CONFIG = None
-        logger.debug('Cleared a Gumo.Task configuration.')
+    return config

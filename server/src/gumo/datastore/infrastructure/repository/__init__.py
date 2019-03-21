@@ -1,9 +1,31 @@
-from gumo.core import get_gumo_config
-from gumo.datastore import get_datastore_config
+from injector import inject
+from contextlib import contextmanager
+
+from gumo.core.injector import injector
+
+from gumo.core import GumoConfiguration
+from gumo.datastore import DatastoreConfiguration
 
 from gumo.datastore.infrastructure.entity_key_mapper import EntityKeyMapper
 
 from google.cloud import datastore
+
+
+class _DatastoreClientFactory:
+    @inject
+    def __init__(
+            self,
+            gumo_config: GumoConfiguration,
+            datastore_config: DatastoreConfiguration
+    ):
+        self._gumo_config = gumo_config
+        self._datastore_config = datastore_config
+
+    def build(self) -> datastore.Client:
+        return datastore.Client(
+            project=self._gumo_config.google_cloud_project.value,
+            namespace=self._datastore_config.namespace,
+        )
 
 
 class DatastoreRepositoryMixin:
@@ -15,19 +37,22 @@ class DatastoreRepositoryMixin:
     @property
     def datastore_client(self) -> datastore.Client:
         if self._datastore_client is None:
-            gumo_config = get_gumo_config()
-            datastore_config = get_datastore_config()
-
-            self._datastore_client = datastore.Client(
-                project=gumo_config.google_cloud_project.value,
-                namespace=datastore_config.namespace,
-            )
+            factory = injector.get(_DatastoreClientFactory)  # type: _DatastoreClientFactory
+            self._datastore_client = factory.build()
 
         return self._datastore_client
 
     @property
     def entity_key_mapper(self) -> EntityKeyMapper:
         if self._entity_key_mapper is None:
-            self._entity_key_mapper = EntityKeyMapper()
+            self._entity_key_mapper = injector.get(EntityKeyMapper)  # type: EntityKeyMapper
 
         return self._entity_key_mapper
+
+
+@contextmanager
+def datastore_transaction():
+    datastore_client = injector.get(_DatastoreClientFactory).build()  # type: datastore.Client
+
+    with datastore_client.transaction():
+        yield

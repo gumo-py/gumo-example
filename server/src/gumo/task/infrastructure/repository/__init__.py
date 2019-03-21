@@ -3,38 +3,15 @@ from logging import getLogger
 from injector import inject
 from typing import Optional
 
-from gumo.datastore import EntityKey
 from gumo.datastore.infrastructure import DatastoreRepositoryMixin
 
 from gumo.task.application.repository import GumoTaskRepository
 
 from gumo.task.domain import GumoTask
 from gumo.task.infrastructure.cloud_tasks import CloudTasksRepository
+from gumo.task.infrastructure.mapper import DatastoreGumoTaskMapper
 
 logger = getLogger(__name__)
-
-
-class DatastoreGumoTaskMapper:
-    def to_datastore_entity(self, task: GumoTask) -> dict:
-        j = {
-            'relative_uri': task.relative_uri,
-            'method': task.method,
-            'payload': task.payload,
-            'schedule_time': task.schedule_time,
-            'created_at': task.created_at,
-        }
-
-        return j
-
-    def to_entity(self, key: EntityKey, doc: dict) -> GumoTask:
-        return GumoTask(
-            key=key,
-            relative_uri=doc.get('relative_uri', doc.get('url')),
-            method=doc.get('method'),
-            payload=doc.get('payload'),
-            schedule_time=doc.get('schedule_time'),
-            created_at=doc.get('created_at'),
-        )
 
 
 class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
@@ -42,9 +19,10 @@ class GumoTaskRepositoryImpl(GumoTaskRepository, DatastoreRepositoryMixin):
     def __init__(
             self,
             cloud_tasks_repository: CloudTasksRepository,
+            gumo_task_mapper: DatastoreGumoTaskMapper,
     ):
         super(GumoTaskRepositoryImpl, self).__init__()
-        self._task_mapper = DatastoreGumoTaskMapper()
+        self._task_mapper = gumo_task_mapper
         self._cloud_tasks_repository = cloud_tasks_repository
 
     def _enqueue_to_cloud_tasks(

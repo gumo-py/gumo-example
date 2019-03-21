@@ -1,6 +1,10 @@
-from gumo.task_emulator.domain.configuration import TaskEmulatorConfiguration
-from gumo.task_emulator._configuration import get_task_emulator_config
+from gumo.task_emulator.application.task.repository import TaskRepository
+from gumo.task_emulator.infrastructure.repository import DatastoreTaskRepository
+
+from gumo.task_emulator.application.task.repository import TaskProcessRepository
+from gumo.task_emulator.infrastructure.repository import DatastoreTaskProcessRepository
 
 
-def bind(binder):
-    binder.bind(TaskEmulatorConfiguration, to=get_task_emulator_config())
+def task_emulator_bind(binder):
+    binder.bind(TaskRepository, to=DatastoreTaskRepository)
+    binder.bind(TaskProcessRepository, to=DatastoreTaskProcessRepository)

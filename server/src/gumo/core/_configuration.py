@@ -1,8 +1,8 @@
 import os
-import threading
 from logging import getLogger
 from typing import Optional
 
+from gumo.core.injector import injector
 from gumo.core.domain import GumoConfiguration
 from gumo.core.domain import GoogleCloudLocation
 from gumo.core.domain import GoogleCloudProjectID
@@ -10,9 +10,6 @@ from gumo.core.domain import ApplicationPlatform
 from gumo.core.exceptions import ConfigurationError
 
 logger = getLogger('gumo.core')
-
-_CONFIG = None
-_CONFIG_LOCK = threading.RLock()  # Guards initialization.
 
 
 class ConfigurationFactory:
@@ -45,58 +42,22 @@ class ConfigurationFactory:
         )
 
 
-def configure(**kwargs):
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            raise ConfigurationError('Gumo is already configured.')
-
-        _CONFIG = ConfigurationFactory.build(**kwargs)
-        logger.debug(f'Gumo is configured, config={_CONFIG}')
-
-        if 'GOOGLE_CLOUD_PROJECT' not in os.environ:
-            logger.debug('Environment Variable "GOOGLE_CLOUD_PROJECT" is not configured.')
-            project_id = _CONFIG.google_cloud_project.value
-            os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
-            logger.debug(f'Environment Variable "GOOGLE_CLOUD_PROJECT" is update to {project_id}')
-
-        return _CONFIG
-
-
-def configure_once(
+def configure(
         google_cloud_project: Optional[str] = None,
         google_cloud_location: Optional[str] = None,
 ):
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
+    conifg = ConfigurationFactory.build(
+        google_cloud_project=google_cloud_project,
+        google_cloud_location=google_cloud_location,
+    )
+    logger.debug(f'Gumo is configured, config={conifg}')
 
-        return configure(
-            google_cloud_project=google_cloud_project,
-            google_cloud_location=google_cloud_location,
-        )
+    if 'GOOGLE_CLOUD_PROJECT' not in os.environ:
+        logger.debug('Environment Variable "GOOGLE_CLOUD_PROJECT" is not configured.')
+        project_id = conifg.google_cloud_project.value
+        os.environ['GOOGLE_CLOUD_PROJECT'] = project_id
+        logger.debug(f'Environment Variable "GOOGLE_CLOUD_PROJECT" has been updated to {project_id}')
 
+    injector.binder.bind(GumoConfiguration, conifg)
 
-def is_configured():
-    with _CONFIG_LOCK:
-        return _CONFIG is not None
-
-
-def get_gumo_config() -> GumoConfiguration:
-    with _CONFIG_LOCK:
-        if _CONFIG:
-            return _CONFIG
-        else:
-            raise ConfigurationError('Gumo is not configured.')
-
-
-def clear():
-    global _CONFIG
-
-    with _CONFIG_LOCK:
-        if _CONFIG is None:
-            return
-
-        _CONFIG = None
-        logger.debug('Cleared a gumo configuration.')
+    return conifg

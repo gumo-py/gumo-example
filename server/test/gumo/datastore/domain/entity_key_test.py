@@ -1,6 +1,6 @@
 import pytest
 
-from gumo.datastore.domain.entity_key import RootKey
+from gumo.datastore.domain.entity_key import NoneKey
 from gumo.datastore.domain.entity_key import EntityKey
 from gumo.datastore.domain.entity_key import EntityKeyFactory
 
@@ -28,12 +28,12 @@ def test_pairs_to_key():
     assert parent.kind() == 'Book'
     assert parent.name() == 'name'
 
-    root = parent.parent()
-    assert isinstance(root, RootKey)
-    assert len(root.pairs()) == 0
-    assert root.kind() == 'Root'
-    assert root.name() == 'root'
-    assert root.parent() == root
+    none = parent.parent()
+    assert isinstance(none, NoneKey)
+    assert len(none.pairs()) == 0
+    assert none.kind() is None
+    assert none.name() is None
+    assert none.parent() == none
 
 
 def test_dict_pairs_to_key():
@@ -53,7 +53,7 @@ def test_build():
     key = EntityKeyFactory().build(kind='Book', name='name')
     assert key.kind() == 'Book'
     assert key.name() == 'name'
-    assert isinstance(key.parent(), RootKey)
+    assert isinstance(key.parent(), NoneKey)
 
 
 def test_build_for_new():
@@ -61,7 +61,7 @@ def test_build_for_new():
     assert key.kind() == 'Book'
     assert isinstance(key.name(), str)
     assert len(key.name()) == 26
-    assert isinstance(key.parent(), RootKey)
+    assert isinstance(key.parent(), NoneKey)
 
 
 def test_entity_key_literal():
@@ -83,3 +83,10 @@ def test_entity_key_path():
     assert factory.build_from_key_path(key.key_path_urlsafe()) == key
     assert factory.build_from_key_path(child.key_path()) == child
     assert factory.build_from_key_path(child.key_path_urlsafe()) == child
+
+
+def test_none_key_eq():
+    key1 = NoneKey()
+    key2 = NoneKey()
+
+    assert key1 == key2

@@ -60,6 +60,12 @@ def task():
 
     return 'ok'
 
+
+@app.route('/task-processing', methods=['GET', 'POST'])
+def task_proc():
+    return 'task-processing done.'
+
+
 if __name__ == '__main__':
     server_port = os.environ.get('SERVER_PORT', '8080')
     app.run(host='0.0.0.0', port=server_port, debug=True)

@@ -13,7 +13,7 @@ services:
       DATASTORE_EMULATOR_HOST: datastore_emulator:8081
       GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
       USE_TASK_EMULATOR: "true"
-    links:
+    depends_on:
       - datastore_emulator
     ports:
       - "8080:8080"
@@ -69,7 +69,7 @@ services:
       context: server/tools/datastore_ui
     environment:
       PORT: "8000"
-    links:
+    depends_on:
       - datastore_emulator
       - datastore_emulator_test
     ports:
@@ -82,12 +82,13 @@ services:
     volumes:
       - ./server:/app
     environment:
+      SERVER_HOST: server
       SERVER_PORT: 8080
       TASK_EMULATOR_PORT: 8083
       DATASTORE_EMULATOR_HOST: datastore_emulator:8081
       GOOGLE_APPLICATION_CREDENTIALS: "/app/credentials/service-account-development.json"
       USE_TASK_EMULATOR: "true"
-    links:
+    depends_on:
       - server
       - datastore_emulator
     ports:
