@@ -25,9 +25,12 @@ task_emulator.configure(
     server_port=os.environ.get('SERVER_PORT'),
 )
 
-app = task_emulator_app()
+app, worker = task_emulator_app()
 
 
 if __name__ == '__main__':
-    server_port = os.environ.get('TASK_EMULATOR_PORT', '8083')
-    app.run(host='0.0.0.0', port=server_port, debug=True)
+    if os.environ.get('WORKER'):
+        worker.start()
+    else:
+        server_port = os.environ.get('TASK_EMULATOR_PORT', '8083')
+        app.run(host='0.0.0.0', port=server_port, debug=True)
