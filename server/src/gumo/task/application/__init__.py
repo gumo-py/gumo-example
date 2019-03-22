@@ -26,6 +26,7 @@ def enqueue(
         payload=payload,
         schedule_time=schedule_time,
         in_seconds=in_seconds,
+        queue_name=queue_name,
     )
 
     logger.info(f'gumo.task.enqueue called. task = {task}')

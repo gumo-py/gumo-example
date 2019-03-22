@@ -27,6 +27,7 @@ class TaskJSONEncoder:
             'payload': self._task.payload,
             'scheduleTime': self.datetime_to_json(self._task.schedule_time),
             'createdAt': self.datetime_to_json(self._task.created_at),
+            'queueName': self._task.queue_name,
         }
         return j
 

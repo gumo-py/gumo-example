@@ -20,6 +20,7 @@ class DatastoreGumoTaskMapper:
             'payload': task.payload,
             'schedule_time': task.schedule_time,
             'created_at': task.created_at,
+            'queue_name': task.queue_name,
         }
 
         return j
@@ -32,4 +33,5 @@ class DatastoreGumoTaskMapper:
             payload=doc.get('payload'),
             schedule_time=doc.get('schedule_time'),
             created_at=doc.get('created_at'),
+            queue_name=doc.get('queue_name'),
         )

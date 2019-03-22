@@ -17,6 +17,7 @@ class GumoTaskFactory:
             schedule_time: Optional[datetime.date] = None,
             in_seconds: Optional[int] = None,
             created_at: Optional[datetime.datetime] = None,
+            queue_name: Optional[str] = None,
     ) -> GumoTask:
         now = datetime.datetime.utcnow().replace(microsecond=0)
 
@@ -37,6 +38,7 @@ class GumoTaskFactory:
             payload=payload,
             schedule_time=schedule_time,
             created_at=created_at if created_at else now,
+            queue_name=queue_name,
         )
 
     def build_for_new(
@@ -47,6 +49,7 @@ class GumoTaskFactory:
             schedule_time: Optional[datetime.date] = None,
             in_seconds: Optional[int] = None,
             created_at: Optional[datetime.datetime] = None,
+            queue_name: Optional[str] = None,
     ) -> GumoTask:
 
         return self.build(
@@ -57,4 +60,5 @@ class GumoTaskFactory:
             schedule_time=schedule_time,
             in_seconds=in_seconds,
             created_at=created_at,
+            queue_name=queue_name,
         )
