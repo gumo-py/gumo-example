@@ -79,6 +79,7 @@ class GumoTaskProcess:
     schedule_time: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
     created_at: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
     updated_at: datetime.datetime = dataclasses.field(default_factory=datetime.datetime.utcnow)
+    queue_name: Optional[str] = None
     state: TaskState = TaskState.QUEUED
     attempts: int = 0
     last_run_at: Optional[datetime.datetime] = None
@@ -189,6 +190,7 @@ class GumoTaskProcessFactory:
             schedule_time=task.schedule_time,
             created_at=task.created_at,
             updated_at=now,
+            queue_name=task.queue_name,
             state=TaskState.QUEUED,
             attempts=0,
             last_run_at=None,
