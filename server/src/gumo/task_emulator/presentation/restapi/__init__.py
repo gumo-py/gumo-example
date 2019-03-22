@@ -44,6 +44,22 @@ class TasksEmulatorEnqueue(flask.views.MethodView):
         return flask.jsonify(result)
 
 
+class TaskProcessesView(flask.views.MethodView):
+    _repository = injector.get(TaskProcessRepository)  # type: TaskProcessRepository
+
+    def get(self):
+        task_processes = self._repository.fetch_tasks()
+        for t in task_processes:
+            logger.info(TaskProcessJSONEncoder(t).to_json())
+
+        return flask.jsonify({
+            'tasks': [
+                TaskProcessJSONEncoder(task_process=task_process).to_json()
+                for task_process in task_processes
+            ]
+        })
+
+
 class QueuedTasksView(flask.views.MethodView):
     _repository = injector.get(TaskProcessRepository)  # type: TaskProcessRepository
 
@@ -51,7 +67,10 @@ class QueuedTasksView(flask.views.MethodView):
         task_processes = self._repository.fetch_tasks_by_state(state=TaskState.QUEUED)
 
         return flask.jsonify({
-            'tasks': [TaskProcessJSONEncoder(task_process).to_json() for task_process in task_processes]
+            'tasks': [
+                TaskProcessJSONEncoder(task_process).to_json()
+                for task_process in task_processes
+            ]
         })
 
 
@@ -78,6 +97,12 @@ emulator_api_blueprint.add_url_rule(
     '/api/task_emulator/enqueue',
     view_func=TasksEmulatorEnqueue.as_view(name='task_emulator/enqueue'),
     methods=['GET', 'POST']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/task_emulator/tasks',
+    view_func=TaskProcessesView.as_view(name='task_emulator/tasks'),
+    methods=['GET']
 )
 
 emulator_api_blueprint.add_url_rule(

@@ -25,5 +25,8 @@ class TaskProcessRepository:
     def fetch_tasks_by_state(self, state: TaskState, limit: Optional[int] = None) -> List[GumoTaskProcess]:
         raise NotImplementedError()
 
+    def fetch_tasks(self, limit: Optional[int] = None) -> List[GumoTaskProcess]:
+        raise NotImplementedError()
+
     def save(self, task_process: GumoTaskProcess):
         raise NotImplementedError()
