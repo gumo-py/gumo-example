@@ -6,10 +6,10 @@ from gumo.core.injector import injector
 from gumo.datastore import EntityKeyFactory
 
 from gumo.task_emulator.application import TaskExecuteService
-from gumo.task_emulator.application.task import TaskFetchService
 from gumo.task_emulator.application.task import TaskProcessBulkCreateService
 from gumo.task_emulator.application.task.encoder import TaskJSONEncoder
 from gumo.task_emulator.application.task.encoder import TaskProcessJSONEncoder
+from gumo.task_emulator.application.task.repository import TaskRepository
 from gumo.task_emulator.application.task.repository import TaskProcessRepository
 
 from gumo.task_emulator.domain import TaskState
@@ -19,10 +19,10 @@ emulator_api_blueprint = flask.Blueprint('task-emulator', __name__)
 
 
 class TasksView(flask.views.MethodView):
-    _task_fetch_service = injector.get(TaskFetchService)  # type: TaskFetchService
+    _repository  = injector.get(TaskRepository)  # type: TaskRepository
 
     def get(self):
-        tasks = self._task_fetch_service.fetch()
+        tasks = self._repository.fetch_tasks(limit=100)
 
         return flask.jsonify({
             'results': [TaskJSONEncoder(task).to_json() for task in tasks]

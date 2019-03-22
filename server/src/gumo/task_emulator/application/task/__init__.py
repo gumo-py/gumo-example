@@ -1,6 +1,5 @@
 from logging import getLogger
 
-from typing import List
 from injector import inject
 
 from gumo.core.exceptions import ObjectNotoFoundError
@@ -13,18 +12,6 @@ from gumo.task_emulator.application.task.repository import TaskRepository
 from gumo.task_emulator.application.task.repository import TaskProcessRepository
 
 logger = getLogger(__name__)
-
-
-class TaskFetchService:
-    @inject
-    def __init__(
-            self,
-            repository: TaskRepository,
-    ):
-        self._repository = repository
-
-    def fetch(self) -> List[GumoTask]:
-        return self._repository.fetch_tasks()
 
 
 class TaskProcessBulkCreateService:
