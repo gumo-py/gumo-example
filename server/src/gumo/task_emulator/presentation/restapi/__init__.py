@@ -11,6 +11,7 @@ from gumo.task_emulator.application.task.encoder import TaskJSONEncoder
 from gumo.task_emulator.application.task.encoder import TaskProcessJSONEncoder
 from gumo.task_emulator.application.task.repository import TaskRepository
 from gumo.task_emulator.application.task.repository import TaskProcessRepository
+from gumo.task_emulator.application.task.repository import TaskProcessSummaryRepository
 
 from gumo.task_emulator.domain import TaskState
 
@@ -60,6 +61,17 @@ class TaskProcessesView(flask.views.MethodView):
         })
 
 
+class TaskSummaryView(flask.views.MethodView):
+    _repository = injector.get(TaskProcessSummaryRepository)  # type: TaskProcessSummaryRepository
+
+    def get(self):
+        summary = self._repository.fetch_summary()
+
+        return flask.jsonify({
+            'summary': summary.to_dict(),
+        })
+
+
 class QueuedTasksView(flask.views.MethodView):
     _repository = injector.get(TaskProcessRepository)  # type: TaskProcessRepository
 
@@ -102,6 +114,12 @@ emulator_api_blueprint.add_url_rule(
 emulator_api_blueprint.add_url_rule(
     '/api/task_emulator/tasks',
     view_func=TaskProcessesView.as_view(name='task_emulator/tasks'),
+    methods=['GET']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/task_emulator/tasks/summary',
+    view_func=TaskSummaryView.as_view(name='task_emulator/tasks/summary'),
     methods=['GET']
 )
 
