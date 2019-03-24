@@ -138,8 +138,8 @@ class GumoTaskProcess:
     def reach_max_retries(self):
         return self.attempts > self.MAX_RETRY_COUNT
 
-    def with_failed(self, history: ProcessHistory):
-        if self.reach_max_retries():
+    def with_failed(self, history: ProcessHistory, force_failed: bool = False):
+        if self.reach_max_retries() or force_failed:
             return self._with_failed_permanent(history=history)
         else:
             return self._with_failed_to_retry(history=history)
@@ -207,3 +207,45 @@ class GumoTaskProcessFactory:
         histories = task_process.histories
         histories.append(history)
         return dataclasses.replace(task_process, histories=histories)
+
+
+@dataclasses.dataclass(frozen=True)
+class TaskCount:
+    count: int
+    has_next: bool
+
+    def __str__(self):
+        if self.has_next:
+            return f'{self.count}+'
+        else:
+            return f'{self.count}'
+
+
+@dataclasses.dataclass(frozen=True)
+class QueueStatus:
+    queue_name: str
+    queued_tasks_count: TaskCount
+    processing_tasks_count: TaskCount
+    succeeded_tasks_count: TaskCount
+    failed_tasks_count: TaskCount
+    oldest_schedule_time: Optional[datetime.datetime]
+
+    def to_dict(self) -> dict:
+        return {
+            'queue_name': self.queue_name,
+            'queued_tasks_count': str(self.queued_tasks_count),
+            'processing_tasks_count': str(self.processing_tasks_count),
+            'succeeded_tasks_count': str(self.succeeded_tasks_count),
+            'failed_tasks_count': str(self.failed_tasks_count),
+            'oldest_schedule_time': self.oldest_schedule_time.isoformat() if self.oldest_schedule_time else None,
+        }
+
+
+@dataclasses.dataclass(frozen=True)
+class QueueStatusCollection:
+    queue_statuses: List[QueueStatus]
+
+    def to_dict(self) -> List[dict]:
+        return [
+            q.to_dict() for q in self.queue_statuses
+        ]

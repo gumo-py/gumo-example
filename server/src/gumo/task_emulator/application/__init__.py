@@ -86,3 +86,37 @@ class TaskExecuteService:
             state=TaskExecuteState.RUN_AND_SUCCESS,
             task_process=finished,
         )
+
+
+class TaskMarkAsFailedService:
+    @inject
+    def __init__(
+            self,
+            task_process_repository: TaskProcessRepository,
+    ):
+        self._task_process_repository = task_process_repository
+
+    def execute(self, key: EntityKey) -> GumoTaskProcess:
+        task_process = self._task_process_repository.fetch_by_key(key=key)
+
+        if task_process.state.is_finished():
+            return task_process
+
+        now = datetime.datetime.utcnow()
+
+        failed = task_process.with_failed(
+            history=ProcessHistory(
+                started_at=now,
+                duration_seconds=0,
+                method=task_process.method,
+                url=task_process.relative_uri,
+                data=None,
+            ),
+            force_failed=True,
+        ).with_state(
+            state=TaskState.FAILED,
+        )
+
+        self._task_process_repository.save(failed)
+
+        return failed

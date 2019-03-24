@@ -8,6 +8,7 @@ from gumo.task.domain import GumoTask
 
 from gumo.task.application.factory import GumoTaskFactory
 from gumo.task.application.repository import GumoTaskRepository
+from gumo.task.domain.configuration import TaskConfiguration
 
 logger = getLogger(__name__)
 
@@ -20,6 +21,10 @@ def enqueue(
         in_seconds: Optional[int] = None,
         queue_name: Optional[str] = None,
 ) -> GumoTask:
+    if queue_name is None:
+        task_config = injector.get(TaskConfiguration)  # type: TaskConfiguration
+        queue_name = task_config.default_queue_name
+
     task = GumoTaskFactory().build_for_new(
         relative_uri=url,
         method=method,
