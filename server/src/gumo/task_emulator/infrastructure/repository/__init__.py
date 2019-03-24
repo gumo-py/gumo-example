@@ -95,8 +95,15 @@ class DatastoreTaskProcessRepository(TaskProcessRepository, DatastoreRepositoryM
         task_processes = self._fetch_query(query=query, limit=limit)
         return task_processes
 
-    def fetch_tasks(self, limit: Optional[int] = None) -> List[GumoTaskProcess]:
+    def fetch_tasks(
+            self,
+            queue_name: Optional[str] = None,
+            limit: Optional[int] = None,
+    ) -> List[GumoTaskProcess]:
         query = self._build_query()
+
+        if queue_name:
+            query.add_filter('queue_name', '=', queue_name)
 
         task_processes = self._fetch_query(query=query, limit=limit)
         return task_processes
@@ -105,6 +112,16 @@ class DatastoreTaskProcessRepository(TaskProcessRepository, DatastoreRepositoryM
         datastore_entity = self._task_process_mapper.to_datastore_entity(task_process=task_process)
         logger.debug(f'Datastore Put key={datastore_entity.key}')
         self.datastore_client.put(datastore_entity)
+
+    def cleanup_finished_tasks(self):
+        for state in [TaskState.SUCCEEDED.value, TaskState.FAILED.value]:
+            query = self._build_query()
+            query.add_filter('state', '=', state)
+            query.keys_only()
+
+            keys = [task.key for task in query.fetch()]
+            logger.info(f'cleanup target keys={len(keys)} items')
+            self.datastore_client.delete_multi(keys=keys)
 
 
 class DatastoreTaskProcessSummaryRepository(TaskProcessSummaryRepository, DatastoreRepositoryMixin):
@@ -124,18 +141,16 @@ class DatastoreTaskProcessSummaryRepository(TaskProcessSummaryRepository, Datast
         query.keys_only()
 
         limit = 100
-        result = query.fetch(limit=limit + 1)
-        for _ in result:
-            pass
+        result = [task for task in query.fetch(limit=limit + 1)]
 
-        if result.num_results >= limit + 1:
+        if len(result) >= limit + 1:
             return TaskCount(
-                count=result.num_results - 1,
+                count=len(result) - 1,
                 has_next=True,
             )
         else:
             return TaskCount(
-                count=result.num_results,
+                count=len(result),
                 has_next=False,
             )
 
@@ -152,7 +167,7 @@ class DatastoreTaskProcessSummaryRepository(TaskProcessSummaryRepository, Datast
 
     def _fetch_queue_status(self, queue_name: str) -> QueueStatus:
         return QueueStatus(
-            queue_name=queue_name if queue_name else '<unknown-queue>',
+            queue_name=queue_name if queue_name else 'unknown-queue',
             queued_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.QUEUED),
             processing_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.PROCESSING),
             succeeded_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.SUCCEEDED),

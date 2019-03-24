@@ -138,8 +138,8 @@ class GumoTaskProcess:
     def reach_max_retries(self):
         return self.attempts > self.MAX_RETRY_COUNT
 
-    def with_failed(self, history: ProcessHistory):
-        if self.reach_max_retries():
+    def with_failed(self, history: ProcessHistory, force_failed: bool = False):
+        if self.reach_max_retries() or force_failed:
             return self._with_failed_permanent(history=history)
         else:
             return self._with_failed_to_retry(history=history)
