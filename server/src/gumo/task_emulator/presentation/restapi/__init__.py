@@ -6,13 +6,13 @@ from gumo.core.injector import injector
 from gumo.datastore import EntityKeyFactory
 
 from gumo.task_emulator.application import TaskExecuteService
+from gumo.task_emulator.application import TaskMarkAsFailedService
 from gumo.task_emulator.application.task import TaskProcessBulkCreateService
 from gumo.task_emulator.application.task.encoder import TaskJSONEncoder
 from gumo.task_emulator.application.task.encoder import TaskProcessJSONEncoder
 from gumo.task_emulator.application.task.repository import TaskRepository
 from gumo.task_emulator.application.task.repository import TaskProcessRepository
 from gumo.task_emulator.application.task.repository import TaskProcessSummaryRepository
-
 from gumo.task_emulator.domain import TaskState
 
 logger = getLogger(__name__)
@@ -33,6 +33,17 @@ class TasksView(flask.views.MethodView):
         return 'ok'
 
 
+class TaskDetailView(flask.views.MethodView):
+    _repository = injector.get(TaskProcessRepository)  # type: TaskProcessRepository
+
+    def get(self, key):
+        task = self._repository.fetch_by_key(
+            key=EntityKeyFactory().build_from_key_path(key)
+        )
+
+        return flask.jsonify(TaskProcessJSONEncoder(task).to_json())
+
+
 class TasksEmulatorEnqueue(flask.views.MethodView):
     _task_process_create_service = injector.get(TaskProcessBulkCreateService)  # type: TaskProcessBulkCreateService
 
@@ -50,8 +61,6 @@ class TaskProcessesView(flask.views.MethodView):
 
     def get(self):
         task_processes = self._repository.fetch_tasks()
-        for t in task_processes:
-            logger.info(TaskProcessJSONEncoder(t).to_json())
 
         return flask.jsonify({
             'tasks': [
@@ -94,15 +103,36 @@ class ExecuteTaskView(flask.views.MethodView):
         return flask.jsonify(result.to_json())
 
 
-@emulator_api_blueprint.route('/')
-def hello():
-    return 'ok'
+class TaskRemoveView(flask.views.MethodView):
+    _service = injector.get(TaskMarkAsFailedService)  # type: TaskMarkAsFailedService
+
+    def get(self, key):
+        task = self._service.execute(
+            key=EntityKeyFactory().build_from_key_path(key)
+        )
+
+        return flask.jsonify(TaskProcessJSONEncoder(task).to_json())
+
+
+class TaskCleanupView(flask.views.MethodView):
+    _repository = injector.get(TaskProcessRepository)  # type: TaskProcessRepository
+
+    def get(self):
+        self._repository.cleanup_finished_tasks()
+
+        return flask.jsonify({'cleanup': 'ok'})
 
 
 emulator_api_blueprint.add_url_rule(
     '/api/tasks',
     view_func=TasksView.as_view(name='tasks'),
     methods=['GET', 'POST']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/tasks/<key>',
+    view_func=TaskDetailView.as_view(name='tasks/detail'),
+    methods=['GET']
 )
 
 emulator_api_blueprint.add_url_rule(
@@ -132,5 +162,17 @@ emulator_api_blueprint.add_url_rule(
 emulator_api_blueprint.add_url_rule(
     '/api/task_emulator/tasks/<key>/execute',
     view_func=ExecuteTaskView.as_view(name='task_emulator/tasks/execute'),
+    methods=['GET']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/task_emulator/tasks/<key>/remove',
+    view_func=TaskRemoveView.as_view(name='task_emulator/tasks/remove'),
+    methods=['GET']
+)
+
+emulator_api_blueprint.add_url_rule(
+    '/api/task_emulator/cleanup',
+    view_func=TaskCleanupView.as_view(name='task_emulator/cleanup'),
     methods=['GET']
 )
