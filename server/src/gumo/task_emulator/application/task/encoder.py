@@ -27,6 +27,7 @@ class TaskJSONEncoder:
             'payload': self._task.payload,
             'scheduleTime': self.datetime_to_json(self._task.schedule_time),
             'createdAt': self.datetime_to_json(self._task.created_at),
+            'queueName': self._task.queue_name,
         }
         return j
 
@@ -53,6 +54,7 @@ class TaskProcessJSONEncoder:
             'scheduleTime': self.datetime_to_json(self._task_process.schedule_time),
             'createdAt': self.datetime_to_json(self._task_process.created_at),
             'updatedAt': self.datetime_to_json(self._task_process.updated_at),
+            'queueName': self._task_process.queue_name,
             'state': self._task_process.state.value,
             'attempts': self._task_process.attempts,
             'lastRunAt': self.datetime_to_json(self._task_process.last_run_at),

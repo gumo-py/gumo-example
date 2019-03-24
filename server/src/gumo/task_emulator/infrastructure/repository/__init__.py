@@ -63,6 +63,15 @@ class DatastoreTaskProcessRepository(TaskProcessRepository, DatastoreRepositoryM
     def _build_query(self):
         return self.datastore_client.query(kind=GumoTaskProcess.KIND)
 
+    def _fetch_query(self, query, limit) -> List[GumoTaskProcess]:
+        task_processes = []
+        for datastore_entity in query.fetch(limit=(limit or 10)):
+            task_processes.append(
+                self._task_process_mapper.to_entity(datastore_entity=datastore_entity)
+            )
+
+        return task_processes
+
     def fetch_by_key(self, key: EntityKey) -> GumoTaskProcess:
         datastore_key = self.entity_key_mapper.to_datastore_key(entity_key=key)
         datastore_entity = self.datastore_client.get(key=datastore_key)
@@ -79,12 +88,13 @@ class DatastoreTaskProcessRepository(TaskProcessRepository, DatastoreRepositoryM
         query.add_filter('run_at', '<=', now)
         query.order = ['run_at']
 
-        task_processes = []
-        for datastore_entity in query.fetch(limit=(limit or 10)):
-            task_processes.append(
-                self._task_process_mapper.to_entity(datastore_entity=datastore_entity)
-            )
+        task_processes = self._fetch_query(query=query, limit=limit)
+        return task_processes
 
+    def fetch_tasks(self, limit: Optional[int] = None) -> List[GumoTaskProcess]:
+        query = self._build_query()
+
+        task_processes = self._fetch_query(query=query, limit=limit)
         return task_processes
 
     def save(self, task_process: GumoTaskProcess):
