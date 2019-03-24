@@ -21,6 +21,12 @@
                     <b-table striped hover :items="items" />
                 </b-col>
             </b-row>
+
+            <b-row>
+                <div>
+                    {{asyncData}}
+                </div>
+            </b-row>
         </b-container>
     </div>
   </section>
@@ -32,6 +38,11 @@ import Logo from '~/components/Logo.vue'
 export default {
     components: {
         Logo
+    },
+
+    async asyncData({ $axios }) {
+        const ip = await $axios.$get('http://icanhazip.com');
+        return { ip }
     },
 
     data() {
