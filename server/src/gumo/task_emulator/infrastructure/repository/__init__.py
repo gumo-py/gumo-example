@@ -13,8 +13,12 @@ from gumo.task.infrastructure.mapper import DatastoreGumoTaskMapper
 
 from gumo.task_emulator.domain import GumoTaskProcess
 from gumo.task_emulator.domain import TaskState
+from gumo.task_emulator.domain import TaskCount
+from gumo.task_emulator.domain import QueueStatus
+from gumo.task_emulator.domain import QueueStatusCollection
 from gumo.task_emulator.application.task.repository import TaskRepository
 from gumo.task_emulator.application.task.repository import TaskProcessRepository
+from gumo.task_emulator.application.task.repository import TaskProcessSummaryRepository
 from gumo.task_emulator.infrastructure.mapper import DatastoreGumoTaskProcessMapper
 
 logger = getLogger(__name__)
@@ -101,3 +105,67 @@ class DatastoreTaskProcessRepository(TaskProcessRepository, DatastoreRepositoryM
         datastore_entity = self._task_process_mapper.to_datastore_entity(task_process=task_process)
         logger.debug(f'Datastore Put key={datastore_entity.key}')
         self.datastore_client.put(datastore_entity)
+
+
+class DatastoreTaskProcessSummaryRepository(TaskProcessSummaryRepository, DatastoreRepositoryMixin):
+    def _build_query(self):
+        return self.datastore_client.query(kind=GumoTaskProcess.KIND)
+
+    def _fetch_queue_names(self) -> List[str]:
+        query = self._build_query()
+        query.distinct_on = ['queue_name']
+
+        return [t.get('queue_name') for t in query.fetch()]
+
+    def _fetch_task_count_by_status(self, queue_name: str, state: TaskState):
+        query = self._build_query()
+        query.add_filter('queue_name', '=', queue_name)
+        query.add_filter('state', '=', state.value)
+        query.keys_only()
+
+        limit = 100
+        result = query.fetch(limit=limit + 1)
+        for _ in result:
+            pass
+
+        if result.num_results >= limit + 1:
+            return TaskCount(
+                count=result.num_results - 1,
+                has_next=True,
+            )
+        else:
+            return TaskCount(
+                count=result.num_results,
+                has_next=False,
+            )
+
+    def _fetch_oldest_task_by_queue(self, queue_name: str) -> Optional[datetime.datetime]:
+        query = self._build_query()
+        query.add_filter('queue_name', '=', queue_name)
+        query.add_filter('state', '=', TaskState.QUEUED.value)
+        query.order = ['schedule_time']
+
+        for task in query.fetch(limit=1):
+            return task.get('schedule_time')
+
+        return None
+
+    def _fetch_queue_status(self, queue_name: str) -> QueueStatus:
+        return QueueStatus(
+            queue_name=queue_name if queue_name else '<unknown-queue>',
+            queued_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.QUEUED),
+            processing_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.PROCESSING),
+            succeeded_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.SUCCEEDED),
+            failed_tasks_count=self._fetch_task_count_by_status(queue_name=queue_name, state=TaskState.FAILED),
+            oldest_schedule_time=self._fetch_oldest_task_by_queue(queue_name=queue_name),
+        )
+
+    def fetch_summary(self) -> QueueStatusCollection:
+        queue_names = self._fetch_queue_names()
+        queue_statuses = []
+        for queue_name in queue_names:
+            queue_statuses.append(
+                self._fetch_queue_status(queue_name=queue_name)
+            )
+
+        return QueueStatusCollection(queue_statuses=queue_statuses)
