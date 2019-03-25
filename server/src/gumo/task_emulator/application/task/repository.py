@@ -5,6 +5,7 @@ from gumo.datastore import EntityKey
 from gumo.task.domain import GumoTask
 from gumo.task_emulator.domain import GumoTaskProcess
 from gumo.task_emulator.domain import TaskState
+from gumo.task_emulator.domain import QueueStatusCollection
 
 
 class TaskRepository:
@@ -25,8 +26,20 @@ class TaskProcessRepository:
     def fetch_tasks_by_state(self, state: TaskState, limit: Optional[int] = None) -> List[GumoTaskProcess]:
         raise NotImplementedError()
 
-    def fetch_tasks(self, limit: Optional[int] = None) -> List[GumoTaskProcess]:
+    def fetch_tasks(
+            self,
+            queue_name: Optional[str] = None,
+            limit: Optional[int] = None,
+    ) -> List[GumoTaskProcess]:
         raise NotImplementedError()
 
     def save(self, task_process: GumoTaskProcess):
+        raise NotImplementedError()
+
+    def cleanup_finished_tasks(self):
+        raise NotImplementedError()
+
+
+class TaskProcessSummaryRepository:
+    def fetch_summary(self) -> QueueStatusCollection:
         raise NotImplementedError()
