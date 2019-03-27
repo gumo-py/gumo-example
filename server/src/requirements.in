@@ -1,7 +1,11 @@
 Flask==1.0.2
 flasgger==0.9.1
 pyyaml==5.1
-injector==0.13.0
+injector==0.15.0
 google-cloud-datastore==1.7.1
 google-cloud-tasks==0.3.0
 google-api-python-client==1.7.4
+gumo-core
+gumo-datastore
+gumo-task
+gumo-task-emulator
