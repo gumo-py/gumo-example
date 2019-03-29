@@ -1,5 +1,10 @@
 pip_compile_option = --upgrade-package gumo-core --upgrade-package gumo-datastore --upgrade-package gumo-task --upgrade-package gumo-task-emulator
 
+.PHONY: setup
+setup:
+	[ -d venv ] || python3 -m venv venv
+	pip3 install twine wheel pytest
+
 .PHONY: pip-compile
 pip-compile:
 	cd server; \
