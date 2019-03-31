@@ -1,13 +1,12 @@
 import os
 
-import gumo
-import gumo.core._configuration
+from gumo import core
 from gumo import datastore
 from gumo import task
 
 
 def app_configure():
-    gumo.core._configuration.configure(
+    core.configure(
         google_cloud_project=os.environ.get('PROJECT_NAME'),
         google_cloud_location=os.environ.get('PROJECT_LOCATION'),
     )
